@@ -1,0 +1,32 @@
+================ Sales Report ================
+User: aida
+Address: No.2, Sweet Road, Melaka
+Nasi_Lemak_with_Fried_Chicken: 8.5 RM x2
+Total Price: RM17
+=============================================
+================ Sales Report ================
+User: aida
+Address: 12, jalan bukit beruang, melaka
+Buttermilk_chicken: 12 RM x2
+Limau_kasturi: 1.6 RM x2
+Total Price: RM27.2
+=============================================
+================ Sales Report ================
+User: user2
+Address: 17, Jalan Willy Wonka, Kuala Lumpur, Malaysia
+Tomyam: 6 RM x1
+Limau_kasturi: 1.6 RM x1
+Total Price: RM7.6
+=============================================
+================ Sales Report ================
+User: aida
+Address: 12, jalan bukit beruang, melaka
+Nasi_Lemak_with_Fried_Chicken: 8.5 RM x1
+Total Price: RM8.5
+=============================================
+================ Sales Report ================
+User: aida
+Address: 12, jalan bukit beruang, melaka
+Tomyam: 6 RM x1
+Total Price: RM6
+=============================================

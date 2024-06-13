@@ -1,0 +1,4 @@
+user user@gmail.com "19, jalan sweet, melaka" 011-1111111 12345 12345
+aida aida@gmail.com "12, jalan bukit beruang, melaka" 019-7141525 12345 12345
+yuhan yuhan@gmail.com "123popo" 01110681326 123 123
+lehan lehan@gmail.com "21, jalan pinang 61, taman daya" 0127101326 123 123
