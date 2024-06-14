@@ -8,10 +8,13 @@
 #include <cctype>
 #include <sstream>
 #include <vector>
+
 using namespace std;
 const int MAX_ITEM = 100;
 int currentSortState = 0; // 0: unsorted, 1: price low to high, 2: price high to low, 3: alphabetical
 
+class Cart;
+// Cart cart;
 struct MenuItem
 {
     string name;
@@ -626,10 +629,10 @@ void searchResults(Node *head, float minPrice, float maxPrice) {
     }
 }
 
-void goBackToMenu(Node *&head);
-void showMenuOptions(Node *&head);
+void goBackToMenu(Node *&head, Cart&);
+void showMenuOptions(Node *&head, Cart &cart);
 
-void addMenuItem(Node *&head){
+void addMenuItem(Node *&head, Cart &cart){
     string itemName;
 
     system("cls");
@@ -663,7 +666,7 @@ void addMenuItem(Node *&head){
 
         // Display the updated menu
         printMenu(head);
-        goBackToMenu(head);
+        goBackToMenu(head,cart);
     }
     else
     {
@@ -673,7 +676,7 @@ void addMenuItem(Node *&head){
 
 // menu sorting algorithm
 // finished
-void algorithmSortMenu(Node *&head){
+void algorithmSortMenu(Node *&head, Cart &cart){
     int sortalgo, radixChoice, bucketChoice;
     system("cls");
     cout << "----------------------------------------" << endl;
@@ -702,15 +705,15 @@ void algorithmSortMenu(Node *&head){
             system("cls");
             radixSort(head);
             printMenu(head);
-            goBackToMenu(head);
-            algorithmSortMenu(head);
+            goBackToMenu(head,cart);
+            algorithmSortMenu(head,cart);
         }
         else if (radixChoice == 2)
         {
             system("cls");
             radixSortDescending(head);
             printMenu(head);
-            goBackToMenu(head);
+            goBackToMenu(head,cart);
         }
         else if (radixChoice == 3)
         {
@@ -734,39 +737,39 @@ void algorithmSortMenu(Node *&head){
             system("cls");
             bucketSortAscending(head);
             printMenu(head);
-            goBackToMenu(head);
+            goBackToMenu(head,cart);
         }
         else if (bucketChoice == 2)
         {
             system("cls");
             bucketSortDescending(head);
             printMenu(head);
-            goBackToMenu(head);
+            goBackToMenu(head,cart);
         }
         else if (bucketChoice == 3)
         {
-            algorithmSortMenu(head);
+            algorithmSortMenu(head,cart);
         }
     }
     else if (sortalgo == 3)
     {
         system("cls");
         printMenu(head);
-        goBackToMenu(head);
+        goBackToMenu(head,cart);
     }
     else if (sortalgo == 4)
     {
-        showMenuOptions(head);
+        showMenuOptions(head, cart);
     }
     else
     {
         cout << "Invalid choice. Please select again." << endl;
-        algorithmSortMenu(head);
+        algorithmSortMenu(head,cart);
     }
 }
 
 // menu search algorithm
-void algorithmSearchMenu(Node *&head){
+void algorithmSearchMenu(Node *&head, Cart &cart){
     int searchType;
     system("cls");
     cout << "----------------------------------------" << endl;
@@ -787,7 +790,7 @@ void algorithmSearchMenu(Node *&head){
         cin.ignore();
         getline(cin, itemName);
         searchResults(head, itemName, searchType);
-        goBackToMenu(head);
+        goBackToMenu(head,cart);
     }
     else if (searchType == 2)
     {
@@ -797,7 +800,7 @@ void algorithmSearchMenu(Node *&head){
         cin.ignore();
         getline(cin, itemName);
         searchResults(head, itemName, searchType);
-        goBackToMenu(head);
+        goBackToMenu(head,cart);
     }
     else if (searchType == 3) {
         system("cls");
@@ -807,16 +810,16 @@ void algorithmSearchMenu(Node *&head){
         cout << "Enter the maximum price: RM ";
         cin >> maxPrice;
         searchResults(head, minPrice, maxPrice);
-        goBackToMenu(head);
+        goBackToMenu(head,cart);
     }
     else if (searchType == 4)
     {
-        showMenuOptions(head);
+        showMenuOptions(head,cart);
     }
     else
     {
         cout << "Invalid choice. Please select again." << endl;
-        algorithmSearchMenu(head);
+        algorithmSearchMenu(head,cart);
     }
 }
 
@@ -854,44 +857,85 @@ void printSortedMenu(Node *head, int displayChoice) {
     }
 }
 
-class Cart {
+class PaymentMethod
+{
+protected:
+    string cardHolderName;
+    string cardNumber;
+    string expirationDate;
+    string cvv;
+
+public:
+    // Function to validate the card number
+    bool isValidCardNumber(const string &cardNumber)
+    {
+        // Check if the card number has 16 digits
+        return cardNumber.length() == 16 && all_of(cardNumber.begin(), cardNumber.end(), ::isdigit);
+    }
+
+    // Function to validate the expiration date
+    bool isValidExpirationDate(const string &expirationDate)
+    {
+        // Check if the expiration date has 5 characters and follows the MM/YY format
+        return expirationDate.length() == 5 && isdigit(expirationDate[0]) && isdigit(expirationDate[1]) &&
+               expirationDate[2] == '/' && isdigit(expirationDate[3]) && isdigit(expirationDate[4]);
+    }
+
+    // Function to validate the CVV
+    bool isValidCVV(const string &cvv)
+    {
+        // Check if the CVV has 3 digits
+        return cvv.length() == 3 && all_of(cvv.begin(), cvv.end(), ::isdigit);
+    }
+};
+
+// inheritance
+class Cart : public PaymentMethod{
 public:
     vector<Node*> items;
     float totalCost = 0.0f;
 
     void addToCart(Node* head) {
-        cout << "\nSelect a food item by entering its number: ";
-        int itemNumber;
-        cin >> itemNumber;
-        Node* temp = head;
-        int counter = 1;
-        while (temp != nullptr) {
-            if (counter == itemNumber) {
-                cout << "You selected: " << counter << ") " << temp->data.name << " RM" << fixed << setprecision(2) << temp->data.price << endl;
-                cout << "Enter the quantity: ";
-                int quantity;
-                cin >> quantity;
-                // Create a new Node with the selected item and quantity
-                Node* newNode = new Node(temp->data);
-                newNode->data.price *= quantity; // Multiply the price by the quantity
-                items.push_back(newNode); // Add the new node to the cart vector
-                totalCost += newNode->data.price;
-                cout << "Current order total: RM" << fixed << setprecision(2) << totalCost << endl;
-                char choice;
-                cout << "Would you like to make another order? [Y/N]: ";
-                cin >> choice;
-                if (toupper(choice) == 'Y') {
-                    addToCart(head); // Recursive call to add more items
-                } else {
-                    goBackToMenu(head); // Go back to the main menu
-                }
-                return;
+    cout << "\nSelect a food item by entering its number: ";
+    int itemNumber;
+    cin >> itemNumber;
+    Node* temp = head;
+    int counter = 1;
+    while (temp != nullptr) {
+        if (counter == itemNumber) {
+            cout << "You selected: " << counter << ") " << temp->data.name << " RM" << fixed << setprecision(2) << temp->data.price << endl;
+            cout << "Enter the quantity: ";
+            int quantity;
+            cin >> quantity;
+            // Create a new Node with the selected item and quantity
+            Node* newNode = new Node(temp->data);
+            newNode->data.price *= quantity; // Multiply the price by the quantity
+            items.push_back(newNode); // Add the new node to the cart vector
+            totalCost += newNode->data.price;
+            cout << "Current order total: RM" << fixed << setprecision(2) << totalCost << endl;
+            char choice;
+            cout << "Would you like to make another order? [Y/N]: ";
+            cin >> choice;
+            if (toupper(choice) == 'Y') {
+                // No recursive call here
+            } else {
+                goBackToMenu(head, *this); // Pass *this to goBackToMenu
+                return; // Exit the function after going back to the menu
             }
-            temp = temp->next;
-            counter++;
         }
-        cout << "Invalid item number." << endl;
-        goBackToMenu(head);
+        temp = temp->next;
+        counter++;
+    }
+    cout << "Invalid item number." << endl;
+    goBackToMenu(head, *this); // Pass *this to goBackToMenu
+}
+
+    void clearCart() {
+    for (auto& item : items) {
+        delete item;
+    }
+    items.clear();
+    totalCost = 0.0f;
     }
 };
 
@@ -959,9 +1003,9 @@ public:
 	
 };//end of class restaurant
 
-void showMenuOptions(Node *&head){
+void showMenuOptions(Node *&head, Cart &cart){
 	Restaurant R;
-	Cart cart;
+	//Cart cart;
     int choice;
     string itemName, line, itemCategory, itemToDelete;
     float itemPrice;
@@ -1051,10 +1095,23 @@ void showMenuOptions(Node *&head){
 } while (displayChoice != 6);
 break;
     
-    case 2:
-
-
-        break;
+        case 2: // My Cart
+            if (cart.items.empty()) {
+                cout << "Your cart is empty." << endl;
+            } else {
+                cout << "My Cart:" << endl;
+                for (const auto& item : cart.items) {
+                    float originalPrice = item->data.price / (item->data.price / item->data.price);
+                    int quantity = item->data.price / originalPrice;
+                    cout << item->data.name << " - Quantity: " << quantity
+                         << " - Price: RM" << fixed << setprecision(2) << item->data.price << endl;
+                }
+                cout << "Total Cost: RM" << fixed << setprecision(2) << cart.totalCost << endl;
+            }
+            cout << "\nPress Enter to continue...";
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.get();
+            break;
 
     case 3:
        
@@ -1068,34 +1125,38 @@ break;
     default:
         system("cls");
         cout << "Invalid choice. Please select again." << endl;
-        showMenuOptions(head);
+        showMenuOptions(head,cart);
         break;
     	} // end of switch
     } // end of while loop
+     goBackToMenu(head, cart); // Pass the cart instance to goBackToMenu
 } // end function
 
-void goBackToMenu(Node *&head){
+void goBackToMenu(Node *&head, Cart& cart) {
+     // Create a static Cart object
+    //static Cart cart;
     cout << "\nEnter 1 to go back to the homepage, 2 to Sorting Menu or 3 to Search Menu: ";
     int backChoice;
     cin >> backChoice;
     if (backChoice == 1)
     {
-        showMenuOptions(head);
+        showMenuOptions(head, cart);
     }
     else if (backChoice == 2)
     {
-        algorithmSortMenu(head);
+        algorithmSortMenu(head, cart);
     }
     else if (backChoice == 3)
     {
-        algorithmSearchMenu(head);
+        algorithmSearchMenu(head, cart);
     }
     else
     {
         cout << "Invalid choice. Please select again." << endl;
-        goBackToMenu(head);
+        goBackToMenu(head, cart); // Recursive call with correct parameters
     }
 }
+
 
 
 struct UserRecord {
@@ -1340,7 +1401,7 @@ public:
 //function declare
 //void welcomePage(User& user, Restaurant R, Node*& head);
 
-void welcomePage(User& user, Restaurant R, Node*& head)
+void welcomePage(User& user, Restaurant R, Node*& head, Cart &cart)
 {
     int choice;
     do
@@ -1367,7 +1428,7 @@ void welcomePage(User& user, Restaurant R, Node*& head)
                 {
                     // Read menu data from file and populate linked list
 				    //R.readFile(head, 0); // Pass 0 as displayChoice to skip sorting
-				    showMenuOptions(head);
+				    showMenuOptions(head,cart);
                 }
                 break;
             case 2:
@@ -1402,8 +1463,9 @@ int main()
     Node *head = nullptr;
     Restaurant R;
 	User user;
+    Cart cart;
 	user.initializeUserRecords();
-	welcomePage(user, R, head);
+	welcomePage(user, R, head, cart);
     // Read menu data from file and populate linked list
     
 
