@@ -891,10 +891,22 @@ public:
 
 // inheritance
 class Cart : public PaymentMethod{
+
 public:
     vector<Node*> items;
     float totalCost = 0.0f;
 
+void clearCart() {
+    // Iterate through the items vector and delete each node
+    for (auto& item : items) {
+        delete item;
+    }
+    // Clear the items vector
+    items.clear();
+    // Reset the total cost
+    totalCost = 0.0f;
+}
+                // end of clearCart
     
 void addToCart(Node* head, bool isSorted) {
     cout << "\nSelect a food item by entering its number: ";
@@ -971,6 +983,15 @@ void addToCart(Node* head, bool isSorted) {
             }
             cout << string(50, '-') << endl;
             cout << "Total Cost: RM" << fixed << setprecision(2) << totalCost << endl;
+            char choice;
+            cout << "Would you like to proceed to payment? (Y/N): " << endl;
+            cin >> choice;
+            if (toupper(choice) == 'Y') {
+                processPayment();
+                // updateSalesCount(user);
+                // updateOrderHistory(); // Add this line to update order history
+                 clearCart();
+            }
         }
     }
 
@@ -1001,6 +1022,41 @@ void addToCart(Node* head, bool isSorted) {
         items.erase(items.begin() + itemNumber - 1);
 
         cout << "Item removed from cart. Updated total: RM" << fixed << setprecision(2) << totalCost << endl;
+    }
+
+        void processPayment()
+    {
+        string cardHolderName, cardNumber, expirationDate, cvv;
+        cin.ignore(); // Clear the newline character from the buffer
+
+        system("cls");
+        cout << "\n=================== Enter payment details ===================" << endl;
+        cout << "Cardholder Name: ";
+        getline(cin, cardHolderName);
+
+        do
+        {
+            cout << "Card Number (16 digits): ";
+            getline(cin, cardNumber);
+        } while (!isValidCardNumber(cardNumber));
+
+        do
+        {
+            cout << "Expiration Date (MM/YY): ";
+            getline(cin, expirationDate);
+        } while (!isValidExpirationDate(expirationDate));
+
+        do
+        {
+            cout << "CVV (3 digits): ";
+            getline(cin, cvv);
+        } while (!isValidCVV(cvv));
+
+        // Process payment logic (you can implement your own payment logic here)
+        cout << "\nProcessing payment..." << endl;
+        cout << "Payment successful. Thank you for your purchase!" << endl;
+        system("pause");
+        system("cls");
     }
 };
 
