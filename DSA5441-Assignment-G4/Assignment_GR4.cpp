@@ -954,22 +954,53 @@ void addToCart(Node* head, bool isSorted) {
             cout << "Your cart is empty." << endl;
         } else {
             cout << "My Cart:" << endl;
-            for (const auto& item : items) {
-                float originalPrice = item->data.price / (item->data.price / item->data.price);
-                int quantity = item->data.price / originalPrice;
-                cout << item->data.name << " - Quantity: " << quantity
-                     << " - Price: RM" << fixed << setprecision(2) << item->data.price << endl;
+            cout << string(50, '-') << endl;
+            cout << left << setw(5) << "No." 
+                 << setw(20) << "Name" 
+                 << setw(10) << "Quantity" 
+                 << setw(15) << "Price (RM)" << endl;
+            cout << string(50, '-') << endl;
+
+            for (size_t i = 0; i < items.size(); ++i) {
+                float originalPrice = items[i]->data.price / (items[i]->data.price / items[i]->data.price);
+                int quantity = items[i]->data.price / originalPrice;
+                cout << left << setw(5) << (i + 1)
+                     << setw(20) << items[i]->data.name 
+                     << setw(10) << quantity
+                     << setw(15) << fixed << setprecision(2) << items[i]->data.price << endl;
             }
+            cout << string(50, '-') << endl;
             cout << "Total Cost: RM" << fixed << setprecision(2) << totalCost << endl;
         }
     }
 
-    void clearCart() {
-        for (auto& item : items) {
-            delete item;
+    void removeFromCart() {
+        if (items.empty()) {
+            cout << "Your cart is empty. Nothing to remove." << endl;
+            return;
         }
-        items.clear();
-        totalCost = 0.0f;
+
+        displayCart();
+
+        int itemNumber;
+        cout << "\nEnter the number of the item you want to remove: ";
+        cin >> itemNumber;
+
+        if (itemNumber < 1 || itemNumber > items.size()) {
+            cout << "Invalid item number. Please try again." << endl;
+            return;
+        }
+
+        Node* removedItem = items[itemNumber - 1];
+        float originalPrice = removedItem->data.price / (removedItem->data.price / removedItem->data.price);
+        int quantity = removedItem->data.price / originalPrice;
+
+        totalCost -= removedItem->data.price;
+        
+        delete removedItem;
+        items.erase(items.begin() + itemNumber - 1);
+
+        cout << "Item removed from cart. Updated total: RM" << fixed << setprecision(2) << totalCost << endl;
     }
 };
 
@@ -1162,8 +1193,12 @@ case 2: // My Cart
     break;
 
     case 3:
-       
-        break;
+        cart.removeFromCart();
+        cout << "\nPress Enter to continue...";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cin.get();
+        break;   
+    
 
     case 4:
         cout << "Thank you for visiting Restaurant Fusion Fare Delights." << endl;
