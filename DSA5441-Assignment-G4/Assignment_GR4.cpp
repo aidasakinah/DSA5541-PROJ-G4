@@ -12,7 +12,7 @@
 using namespace std;
 const int MAX_ITEM = 100;
 int currentSortState = 0; // 0: unsorted, 1: price low to high, 2: price high to low, 3: alphabetical
-
+class Restaurant;  // Forward declaration
 class Cart;
 // Cart cart;
 struct MenuItem
@@ -629,10 +629,10 @@ void searchResults(Node *head, float minPrice, float maxPrice) {
     }
 }
 
-void goBackToMenu(Node *&head, Cart&);
-void showMenuOptions(Node *&head, Cart &cart);
+void goBackToMenu(Node *&head, Cart &cart, Restaurant &R);
+void showMenuOptions(Node *&head, Cart &cart, Restaurant &R);
 
-void addMenuItem(Node *&head, Cart &cart){
+void addMenuItem(Node *&head, Cart &cart, Restaurant &R){
     string itemName;
 
     system("cls");
@@ -666,7 +666,7 @@ void addMenuItem(Node *&head, Cart &cart){
 
         // Display the updated menu
         printMenu(head);
-        goBackToMenu(head,cart);
+        goBackToMenu(head,cart,R);
     }
     else
     {
@@ -676,7 +676,7 @@ void addMenuItem(Node *&head, Cart &cart){
 
 // menu sorting algorithm
 // finished
-void algorithmSortMenu(Node *&head, Cart &cart){
+void algorithmSortMenu(Node *&head, Cart &cart, Restaurant &R){
     int sortalgo, radixChoice, bucketChoice;
     system("cls");
     cout << "----------------------------------------" << endl;
@@ -705,15 +705,15 @@ void algorithmSortMenu(Node *&head, Cart &cart){
             system("cls");
             radixSort(head);
             printMenu(head);
-            goBackToMenu(head,cart);
-            algorithmSortMenu(head,cart);
+            goBackToMenu(head,cart,R);
+            algorithmSortMenu(head,cart,R);
         }
         else if (radixChoice == 2)
         {
             system("cls");
             radixSortDescending(head);
             printMenu(head);
-            goBackToMenu(head,cart);
+            goBackToMenu(head,cart,R);
         }
         else if (radixChoice == 3)
         {
@@ -737,39 +737,39 @@ void algorithmSortMenu(Node *&head, Cart &cart){
             system("cls");
             bucketSortAscending(head);
             printMenu(head);
-            goBackToMenu(head,cart);
+            goBackToMenu(head,cart,R);
         }
         else if (bucketChoice == 2)
         {
             system("cls");
             bucketSortDescending(head);
             printMenu(head);
-            goBackToMenu(head,cart);
+            goBackToMenu(head,cart,R);
         }
         else if (bucketChoice == 3)
         {
-            algorithmSortMenu(head,cart);
+            algorithmSortMenu(head,cart,R);
         }
     }
     else if (sortalgo == 3)
     {
         system("cls");
         printMenu(head);
-        goBackToMenu(head,cart);
+        goBackToMenu(head,cart,R);
     }
     else if (sortalgo == 4)
     {
-        showMenuOptions(head, cart);
+        showMenuOptions(head, cart, R);
     }
     else
     {
         cout << "Invalid choice. Please select again." << endl;
-        algorithmSortMenu(head,cart);
+        algorithmSortMenu(head,cart,R);
     }
 }
 
 // menu search algorithm
-void algorithmSearchMenu(Node *&head, Cart &cart){
+void algorithmSearchMenu(Node *&head, Cart &cart, Restaurant &R){
     int searchType;
     system("cls");
     cout << "----------------------------------------" << endl;
@@ -790,7 +790,7 @@ void algorithmSearchMenu(Node *&head, Cart &cart){
         cin.ignore();
         getline(cin, itemName);
         searchResults(head, itemName, searchType);
-        goBackToMenu(head,cart);
+        goBackToMenu(head,cart,R);
     }
     else if (searchType == 2)
     {
@@ -800,7 +800,7 @@ void algorithmSearchMenu(Node *&head, Cart &cart){
         cin.ignore();
         getline(cin, itemName);
         searchResults(head, itemName, searchType);
-        goBackToMenu(head,cart);
+        goBackToMenu(head,cart,R);
     }
     else if (searchType == 3) {
         system("cls");
@@ -810,16 +810,16 @@ void algorithmSearchMenu(Node *&head, Cart &cart){
         cout << "Enter the maximum price: RM ";
         cin >> maxPrice;
         searchResults(head, minPrice, maxPrice);
-        goBackToMenu(head,cart);
+        goBackToMenu(head,cart,R);
     }
     else if (searchType == 4)
     {
-        showMenuOptions(head,cart);
+        showMenuOptions(head,cart, R);
     }
     else
     {
         cout << "Invalid choice. Please select again." << endl;
-        algorithmSearchMenu(head,cart);
+        algorithmSearchMenu(head,cart,R);
     }
 }
 
@@ -895,7 +895,8 @@ public:
     vector<Node*> items;
     float totalCost = 0.0f;
 
-    void addToCart(Node* head) {
+    
+void addToCart(Node* head, bool isSorted) {
     cout << "\nSelect a food item by entering its number: ";
     int itemNumber;
     cin >> itemNumber;
@@ -907,35 +908,68 @@ public:
             cout << "Enter the quantity: ";
             int quantity;
             cin >> quantity;
-            // Create a new Node with the selected item and quantity
-            Node* newNode = new Node(temp->data);
-            newNode->data.price *= quantity; // Multiply the price by the quantity
-            items.push_back(newNode); // Add the new node to the cart vector
-            totalCost += newNode->data.price;
-            cout << "Current order total: RM" << fixed << setprecision(2) << totalCost << endl;
+
+            // Create a new Node for the cart
+            Node* cartItem = new Node(temp->data);
+            float originalPrice = cartItem->data.price;
+            cartItem->data.price *= quantity; // Adjust price for quantity
+
+            // Check if the item is already in the cart
+            bool itemFound = false;
+            for (auto& item : items) {
+                if (item->data.name == cartItem->data.name) {
+                    // Update existing item
+                    int existingQuantity = item->data.price / originalPrice;
+                    int newQuantity = existingQuantity + quantity;
+                    item->data.price = originalPrice * newQuantity;
+                    delete cartItem; // Delete the newly created node as we don't need it
+                    itemFound = true;
+                    break;
+                }
+            }
+
+            if (!itemFound) {
+                items.push_back(cartItem);
+            }
+
+            totalCost += originalPrice * quantity;
+            cout << "Item added to cart. Current order total: RM" << fixed << setprecision(2) << totalCost << endl;
+
             char choice;
-            cout << "Would you like to make another order? [Y/N]: ";
+            cout << "Would you like to add another item? [Y/N]: ";
             cin >> choice;
             if (toupper(choice) == 'Y') {
-                // No recursive call here
-            } else {
-                goBackToMenu(head, *this); // Pass *this to goBackToMenu
-                return; // Exit the function after going back to the menu
+                addToCart(head, isSorted); // Recursive call to add another item
             }
+            return;
         }
         temp = temp->next;
         counter++;
     }
     cout << "Invalid item number." << endl;
-    goBackToMenu(head, *this); // Pass *this to goBackToMenu
 }
 
-    void clearCart() {
-    for (auto& item : items) {
-        delete item;
+ void displayCart() {
+        if (items.empty()) {
+            cout << "Your cart is empty." << endl;
+        } else {
+            cout << "My Cart:" << endl;
+            for (const auto& item : items) {
+                float originalPrice = item->data.price / (item->data.price / item->data.price);
+                int quantity = item->data.price / originalPrice;
+                cout << item->data.name << " - Quantity: " << quantity
+                     << " - Price: RM" << fixed << setprecision(2) << item->data.price << endl;
+            }
+            cout << "Total Cost: RM" << fixed << setprecision(2) << totalCost << endl;
+        }
     }
-    items.clear();
-    totalCost = 0.0f;
+
+    void clearCart() {
+        for (auto& item : items) {
+            delete item;
+        }
+        items.clear();
+        totalCost = 0.0f;
     }
 };
 
@@ -944,67 +978,92 @@ class Restaurant {
 private:
     float price, itemPrice;
     string itemName;
-	Cart cart;
+	Cart& cart;
+    Node* originalHead;
+    Node* sortedHead;
+
 public:
-    void readFile(Node *&head, int displayChoice) {
-    	if (head == nullptr || currentSortState != displayChoice) {
-	        // Clear the existing list if any
-	        while (head != nullptr) {
-	            Node* temp = head;
-	            head = head->next;
-	            delete temp;
-        	}
 
-	        string menuFileName = "Menu.txt";
-	        ifstream menuFile(menuFileName.c_str(), ios::in);
-	        if (!menuFile) {
-	            cout << "File does not exist";
-	            exit(1);
-	        }
+Restaurant(Cart& c) : cart(c), originalHead(nullptr), sortedHead(nullptr) {}
 
-	        string name, category;
-	        float price;
+    void readFile(int displayChoice) {
+        if (originalHead == nullptr) {
+            // Clear the existing list if any
+            while (originalHead != nullptr) {
+                Node* temp = originalHead;
+                originalHead = originalHead->next;
+                delete temp;
+            }
 
-	        while (menuFile >> name >> price >> category) {
-	            insertMenuItem(head, MenuItem(name, price, category));
-	        }
+            string menuFileName = "Menu.txt";
+            ifstream menuFile(menuFileName.c_str(), ios::in);
+            if (!menuFile) {
+                cout << "File does not exist";
+                exit(1);
+            }
 
-        	menuFile.close();
+            string name, category;
+            float price;
 
-	        if (displayChoice == 1) {
-	            bucketSortAscending(head);
-	        } else if (displayChoice == 2) {
-	            bucketSortDescending(head);
-	        } else if (displayChoice == 3) {
-	            radixSort(head);
-	        } else if (displayChoice == 4) {
-	            radixSortDescending(head);
-	        } 
+            while (menuFile >> name >> price >> category) {
+                insertMenuItem(originalHead, MenuItem(name, price, category));
+            }
 
-        	currentSortState = displayChoice;
-    }//end of if
+            menuFile.close();
+        }
 
-	    system("cls");
-	    cout << "Food and Beverage" << endl;
-	
-	    if (displayChoice == 0) {
-	        printMenu(head);
-	    } else {
-	        printSortedMenu(head, displayChoice);
-	    }
+        createSortedList(displayChoice);
 
-	    char addcartchoice;
-	    cout << "\nWould you like to add items to the cart? [Y/N]: ";
-	    cin >> addcartchoice;
-	    if (toupper(addcartchoice) == 'Y') {
-	        cart.addToCart(head);
-	    }
-	}//end of readFile function
-	
+        system("cls");
+        cout << "Food and Beverage" << endl;
+
+        if (displayChoice == 0) {
+            printMenu(originalHead);
+        } else {
+            printSortedMenu(sortedHead, displayChoice);
+        }
+
+        char addcartchoice;
+        cout << "\nWould you like to add items to the cart? [Y/N]: ";
+        cin >> addcartchoice;
+         if (toupper(addcartchoice) == 'Y') {
+        if (displayChoice == 0) {
+            cart.addToCart(originalHead, false);
+        } else {
+            cart.addToCart(sortedHead, true);
+        }
+    }
+}
+        void createSortedList(int displayChoice) {
+        // Delete previous sortedHead if it exists
+        while (sortedHead != nullptr) {
+            Node* temp = sortedHead;
+            sortedHead = sortedHead->next;
+            delete temp;
+        }
+
+        // Create a new list by copying data from originalHead
+        Node* current = originalHead;
+        while (current != nullptr) {
+            insertMenuItem(sortedHead, current->data);
+            current = current->next;
+        }
+
+        // Sort the new list based on displayChoice
+        if (displayChoice == 1) {
+            bucketSortAscending(sortedHead);
+        } else if (displayChoice == 2) {
+            bucketSortDescending(sortedHead);
+        } else if (displayChoice == 3) {
+            radixSort(sortedHead);
+        } else if (displayChoice == 4) {
+            radixSortDescending(sortedHead);
+        }
+    }
 };//end of class restaurant
 
-void showMenuOptions(Node *&head, Cart &cart){
-	Restaurant R;
+void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
+	//Restaurant R;
 	//Cart cart;
     int choice;
     string itemName, line, itemCategory, itemToDelete;
@@ -1050,7 +1109,7 @@ void showMenuOptions(Node *&head, Cart &cart){
         cin >> displayChoice;
 
         if (displayChoice >= 0 && displayChoice <= 4) {
-            R.readFile(head, displayChoice);
+            R.readFile(displayChoice);
             cout << endl;
             cout << "Press Enter to continue...";
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -1094,24 +1153,13 @@ void showMenuOptions(Node *&head, Cart &cart){
     }
 } while (displayChoice != 6);
 break;
-    
-        case 2: // My Cart
-            if (cart.items.empty()) {
-                cout << "Your cart is empty." << endl;
-            } else {
-                cout << "My Cart:" << endl;
-                for (const auto& item : cart.items) {
-                    float originalPrice = item->data.price / (item->data.price / item->data.price);
-                    int quantity = item->data.price / originalPrice;
-                    cout << item->data.name << " - Quantity: " << quantity
-                         << " - Price: RM" << fixed << setprecision(2) << item->data.price << endl;
-                }
-                cout << "Total Cost: RM" << fixed << setprecision(2) << cart.totalCost << endl;
-            }
-            cout << "\nPress Enter to continue...";
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cin.get();
-            break;
+
+case 2: // My Cart
+    cart.displayCart();
+    cout << "\nPress Enter to continue...";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
+    break;
 
     case 3:
        
@@ -1125,14 +1173,14 @@ break;
     default:
         system("cls");
         cout << "Invalid choice. Please select again." << endl;
-        showMenuOptions(head,cart);
+        showMenuOptions(head,cart,R);
         break;
     	} // end of switch
     } // end of while loop
-     goBackToMenu(head, cart); // Pass the cart instance to goBackToMenu
+     goBackToMenu(head, cart, R); // Pass the cart instance to goBackToMenu
 } // end function
 
-void goBackToMenu(Node *&head, Cart& cart) {
+void goBackToMenu(Node *&head, Cart& cart, Restaurant &R) {
      // Create a static Cart object
     //static Cart cart;
     cout << "\nEnter 1 to go back to the homepage, 2 to Sorting Menu or 3 to Search Menu: ";
@@ -1140,20 +1188,20 @@ void goBackToMenu(Node *&head, Cart& cart) {
     cin >> backChoice;
     if (backChoice == 1)
     {
-        showMenuOptions(head, cart);
+        showMenuOptions(head, cart, R);
     }
     else if (backChoice == 2)
     {
-        algorithmSortMenu(head, cart);
+        algorithmSortMenu(head, cart, R);
     }
     else if (backChoice == 3)
     {
-        algorithmSearchMenu(head, cart);
+        algorithmSearchMenu(head, cart, R);
     }
     else
     {
         cout << "Invalid choice. Please select again." << endl;
-        goBackToMenu(head, cart); // Recursive call with correct parameters
+        goBackToMenu(head, cart,R); // Recursive call with correct parameters
     }
 }
 
@@ -1401,7 +1449,7 @@ public:
 //function declare
 //void welcomePage(User& user, Restaurant R, Node*& head);
 
-void welcomePage(User& user, Restaurant R, Node*& head, Cart &cart)
+void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart)
 {
     int choice;
     do
@@ -1428,7 +1476,7 @@ void welcomePage(User& user, Restaurant R, Node*& head, Cart &cart)
                 {
                     // Read menu data from file and populate linked list
 				    //R.readFile(head, 0); // Pass 0 as displayChoice to skip sorting
-				    showMenuOptions(head,cart);
+				    showMenuOptions(head,cart, R);
                 }
                 break;
             case 2:
@@ -1461,13 +1509,12 @@ void welcomePage(User& user, Restaurant R, Node*& head, Cart &cart)
 int main()
 {
     Node *head = nullptr;
-    Restaurant R;
-	User user;
-    Cart cart;
-	user.initializeUserRecords();
-	welcomePage(user, R, head, cart);
-    // Read menu data from file and populate linked list
-    
+    Cart cart;  
+    Restaurant R(cart);  
+    User user;
+    user.initializeUserRecords();
+    welcomePage(user, R, head, cart);
+
 
     // Clean up dynamically allocated memory
     Node *temp = head;
