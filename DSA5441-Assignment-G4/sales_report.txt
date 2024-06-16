@@ -52,3 +52,11 @@ Order Details:
 - laici_kang (Quantity: 35, Price per unit: RM2.40)
 Total Cost: RM2.40
 =============================================
+================ Sales Report ================
+User: hoho
+Address: jalan huhu
+Order Details:
+- Nasi_Lemak_with_Fried_Chicken (Quantity: 5, Price per unit: RM8.50)
+- yuhan (Quantity: 5, Price per unit: RM88.00)
+Total Cost: RM482.50
+=============================================

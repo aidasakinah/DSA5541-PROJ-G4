@@ -58,16 +58,17 @@ private:
     }
     
     // Helper function to find a user record in the linked list
-    UserRecord* findUserRecord(const string& usernameOrEmail) {
-        UserRecord* current = userRecordHead;
-        while (current != nullptr) {
-            if (current->username == usernameOrEmail || current->email == usernameOrEmail) {
-                return current;
-            }
-            current = current->next;
+    UserRecord* findUserRecord(const string& userRecord) {
+    UserRecord* current = userRecordHead;
+    while (current != nullptr) {
+        string record = current->username + "#" + current->password;
+        if (record == userRecord) {
+            return current;
         }
-        return nullptr; // User record not found
+        current = current->next;
     }
+    return nullptr; // User record not found
+}
     
         // Helper function to find a user record with a given username
     UserRecord* findUserRecordByUsername(const string& username) {
@@ -141,7 +142,7 @@ public:
         file.close();
     }
 	
-    void login() {
+void login() {
     system("cls");
     cout << "User Login" << endl;
     cout << "USERNAME or EMAIL  : ";
@@ -149,18 +150,23 @@ public:
     cout << "PASSWORD           : ";
     getline(cin, inputPassword);
 
-    UserRecord* userRecord = findUserRecord(trim(inputUsername));
-    if (userRecord != nullptr && userRecord->password == inputPassword) {
-        system("cls");
-        username = userRecord->username;
-        address = userRecord->address;
-        cout << "\nHello " << username << "\n<LOGIN SUCCESSFUL>\nThanks for logging in Restaurant Fusion Fare Delights\n";
-        loggedIn = true;
-        //welcomePage(*this, R, head);
+    UserRecord* userRecord = findUserRecordByUsername(trim(inputUsername));
+    if (userRecord != nullptr) {
+        string record = userRecord->username + "#" + userRecord->password;
+        string inputRecord = trim(inputUsername) + "#" + inputPassword;
+        if (record == inputRecord) {
+            system("cls");
+            username = userRecord->username;
+            address = userRecord->address;
+            cout << "\nHello " << username << "\n<LOGIN SUCCESSFUL>\nThanks for logging in Restaurant Fusion Fare Delights\n";
+            loggedIn = true;
+        } else {
+            cout << "\nLOGIN ERROR\nPlease check again your username or email and password\n";
+        }
     } else {
         cout << "\nLOGIN ERROR\nPlease check again your username or email and password\n";
     }
-}     // end of login
+}// end of login
 
     void logout()
     {
@@ -1183,10 +1189,9 @@ void addToCart(Node* head, bool isSorted) {
             cin >> quantity;
 
             // Create a new Node for the cart
-            Node* cartItem = new Node(temp->data);
-            cartItem->data.quantity = quantity; // Set the quantity for the cart item
-            float originalPrice = cartItem->data.price / quantity; // Adjust the price per unit
-            cartItem->data.price *= quantity; // Set the total price for the quantity
+           Node* cartItem = new Node(temp->data);
+           cartItem->data.quantity = quantity; // Set the quantity for the cart item
+           cartItem->data.price *= quantity; // Set the total price for the quantity
 
             // Check if the item is already in the cart
             bool itemFound = false;
@@ -1203,8 +1208,7 @@ void addToCart(Node* head, bool isSorted) {
             if (!itemFound) {
                 items.push_back(cartItem);
             }
-
-            totalCost += originalPrice * quantity;
+            totalCost += cartItem->data.price;
             cout << "Item added to cart. Current order total: RM" << fixed << setprecision(2) << totalCost << endl;
 
             char choice;
@@ -1255,34 +1259,57 @@ void addToCart(Node* head, bool isSorted) {
         }
     }
 
-    void removeFromCart() {
-        if (items.empty()) {
-            cout << "Your cart is empty. Nothing to remove." << endl;
-            return;
-        }
-
-        displayCart();
-
-        int itemNumber;
-        cout << "\nEnter the number of the item you want to remove: ";
-        cin >> itemNumber;
-
-        if (itemNumber < 1 || itemNumber > items.size()) {
-            cout << "Invalid item number. Please try again." << endl;
-            return;
-        }
-
-        Node* removedItem = items[itemNumber - 1];
-        float originalPrice = removedItem->data.price / (removedItem->data.price / removedItem->data.price);
-        int quantity = removedItem->data.price / originalPrice;
-
-        totalCost -= removedItem->data.price;
-        
-        delete removedItem;
-        items.erase(items.begin() + itemNumber - 1);
-
-        cout << "Item removed from cart. Updated total: RM" << fixed << setprecision(2) << totalCost << endl;
+void removeFromCart() {
+    if (items.empty()) {
+        cout << "Your cart is empty. Nothing to remove." << endl;
+        return;
     }
+
+    displayCart();
+
+    int itemNumber;
+    cout << "\nEnter the number of the item you want to remove: ";
+    cin >> itemNumber;
+
+    if (itemNumber < 1 || itemNumber > items.size()) {
+        cout << "Invalid item number. Please try again." << endl;
+        return;
+    }
+
+    Node* selectedItem = items[itemNumber - 1];
+    int currentQuantity = selectedItem->data.quantity;
+    float pricePerUnit = selectedItem->data.price / currentQuantity;
+
+    int quantityToRemove;
+    cout << "How many quantity you want to delete? (Current quantity: " << currentQuantity << "): ";
+    cin >> quantityToRemove;
+
+    if (quantityToRemove <= 0 || quantityToRemove > currentQuantity) {
+        cout << "Invalid quantity. Please try again." << endl;
+        return;
+    }
+
+    if (quantityToRemove == currentQuantity) {
+        // Remove the entire item
+        totalCost -= selectedItem->data.price;
+        delete selectedItem;
+        items.erase(items.begin() + itemNumber - 1);
+        cout << "Item completely removed from cart." << endl;
+    } else {
+        // Update the quantity and price
+        selectedItem->data.quantity -= quantityToRemove;
+        float removedCost = selectedItem->data.price / currentQuantity * quantityToRemove;
+        selectedItem->data.price -= removedCost;
+        totalCost -= removedCost;
+        cout << "Quantity updated for the item." << endl;
+    }
+
+    cout << "Updated total: RM" << fixed << setprecision(2) << totalCost << endl;
+    
+    // Display updated cart
+    cout << "\nUpdated Cart:" << endl;
+    displayCart();
+}
 
         void processPayment()
     {
