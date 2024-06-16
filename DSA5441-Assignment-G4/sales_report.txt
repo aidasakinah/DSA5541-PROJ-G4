@@ -1,0 +1,54 @@
+================ Sales Report ================
+User: 
+Address: 
+Order Details:
+- laici_kang (Quantity: 1, Price: RM2.40)
+- yuhan (Quantity: 1, Price: RM88.00)
+- Milo_cincau (Quantity: 1, Price: RM1.50)
+- Tomyam_udang (Quantity: 1, Price: RM5.60)
+Total Cost: RM97.50
+=============================================
+================ Sales Report ================
+User: 
+Address: 
+Order Details:
+- Fried_Rice (Quantity: 1, Price: RM21.00)
+- yuhan (Quantity: 1, Price: RM176.00)
+Total Cost: RM197.00
+=============================================
+================ Sales Report ================
+User: 
+Address: 
+Order Details:
+- Fried_Rice (Quantity: 1, Price: RM21.00)
+- yuhan (Quantity: 1, Price: RM176.00)
+Total Cost: RM197.00
+=============================================
+================ Sales Report ================
+User: rere
+Address: 000
+Order Details:
+- laici_kang (Quantity: 1, Price: RM84.00)
+Total Cost: RM84.00
+=============================================
+================ Sales Report ================
+User: rere
+Address: 000
+Order Details:
+- laici_kang (Quantity: 1, Price: RM84.00)
+Total Cost: RM84.00
+=============================================
+================ Sales Report ================
+User: yuyu
+Address: eee rrr
+Order Details:
+- laici_kang (Quantity: 35, Price per unit: RM2.40)
+Total Cost: RM2.40
+=============================================
+================ Sales Report ================
+User: yuyu
+Address: eee rrr
+Order Details:
+- laici_kang (Quantity: 35, Price per unit: RM2.40)
+Total Cost: RM2.40
+=============================================

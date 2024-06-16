@@ -14,14 +14,275 @@ const int MAX_ITEM = 100;
 int currentSortState = 0; // 0: unsorted, 1: price low to high, 2: price high to low, 3: alphabetical
 class Restaurant;  // Forward declaration
 class Cart;
+class User;
+
+struct UserRecord {
+	
+    string username;
+    string email;
+    string address;
+    string contactNumber;
+    string password;
+    UserRecord* next; // Pointer to the next node in the linked list
+
+	// containing all the user information stored in its member variables (means store in one node)
+    UserRecord(const string& username, const string& email, const string& address, const string& contactNumber, const string& password)
+        : username(username), email(email), address(address), contactNumber(contactNumber), password(password), next(nullptr) {}
+};
+
+class User
+{
+private:
+    string username;
+    string email;
+    string address;
+    string contactNumber;
+    string password;
+    string cpassword;
+    string inputUsername;
+    string inputPassword;
+    string existingUsername;
+    string existingEmail;
+    bool loggedIn;
+
+    bool isValueExists(const string &filename, const string &valueToCheck);
+
+    // Helper function to trim leading and trailing whitespaces
+    string trim(const string &str) {
+        size_t first = str.find_first_not_of(' ');
+        if (string::npos == first) {
+            return "";
+        }
+        size_t last = str.find_last_not_of(' ');
+        return str.substr(first, (last - first + 1));
+    }
+    
+    // Helper function to find a user record in the linked list
+    UserRecord* findUserRecord(const string& usernameOrEmail) {
+        UserRecord* current = userRecordHead;
+        while (current != nullptr) {
+            if (current->username == usernameOrEmail || current->email == usernameOrEmail) {
+                return current;
+            }
+            current = current->next;
+        }
+        return nullptr; // User record not found
+    }
+    
+        // Helper function to find a user record with a given username
+    UserRecord* findUserRecordByUsername(const string& username) {
+        UserRecord* current = userRecordHead;
+        while (current != nullptr) {
+            if (current->username == username) {
+                return current;
+            }
+            current = current->next;
+        }
+        return nullptr; // User record not found
+    }
+
+    // Helper function to find a user record with a given email
+    UserRecord* findUserRecordByEmail(const string& email) {
+        UserRecord* current = userRecordHead;
+        while (current != nullptr) {
+            if (current->email == email) {
+                return current;
+            }
+            current = current->next;
+        }
+        return nullptr; // User record not found
+    }
+    
+//    Restaurant R;
+//    Node* head = nullptr;
+    //static void welcomePage(User& user, Restaurant& R, Node*& head);
+	UserRecord* userRecordHead;
+	
+public:
+     // Getter functions
+    string getUsername() const {
+        return username;
+    }
+
+    string getAddress() const {
+        return address;
+    }
+	void initializeUserRecords() {
+    readUserRecordsFromFile(); // Load user records from the file
+}
+     User() : loggedIn(false), userRecordHead(nullptr) { readUserRecordsFromFile();}
+
+	 void addUserRecord(const string& username, const string& email, const string& address, const string& contactNumber, const string& password) {
+     UserRecord* newRecord = new UserRecord(username, email, address, contactNumber, password);
+
+        if (userRecordHead == nullptr) {
+            userRecordHead = newRecord;
+        } else {
+            UserRecord* current = userRecordHead;
+            while (current->next != nullptr) {
+                current = current->next;
+            }
+            current->next = newRecord;
+        }
+    }
+
+    void readUserRecordsFromFile() {
+        ifstream file("user records.txt");
+        string line;
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string username, email, address, contactNumber, password, cpassword;
+            ss >> username >> email;
+            ss.ignore(1, '"');
+            getline(ss, address, '"');
+            ss >> contactNumber >> password >> cpassword;
+            addUserRecord(username, email, address, contactNumber, password);
+        }
+        file.close();
+    }
+	
+    void login() {
+    system("cls");
+    cout << "User Login" << endl;
+    cout << "USERNAME or EMAIL  : ";
+    getline(cin, inputUsername);
+    cout << "PASSWORD           : ";
+    getline(cin, inputPassword);
+
+    UserRecord* userRecord = findUserRecord(trim(inputUsername));
+    if (userRecord != nullptr && userRecord->password == inputPassword) {
+        system("cls");
+        username = userRecord->username;
+        address = userRecord->address;
+        cout << "\nHello " << username << "\n<LOGIN SUCCESSFUL>\nThanks for logging in Restaurant Fusion Fare Delights\n";
+        loggedIn = true;
+        //welcomePage(*this, R, head);
+    } else {
+        cout << "\nLOGIN ERROR\nPlease check again your username or email and password\n";
+    }
+}     // end of login
+
+    void logout()
+    {
+        loggedIn = false;
+    }
+
+    void registration()
+    {
+        system("cls");
+        cout << "User Registration\n"
+             << endl;
+        // Prompt user until a valid single-word username is entered
+        do {
+        cout << "Username (Single-Word) \t: ";
+        getline(cin, username);
+
+        // Check if the name contains any space
+        if (username.find(' ') != string::npos) {
+            cout << "\nInvalid username format. Please use a single word without spaces.\n";
+        } else if (findUserRecordByUsername(trim(username)) != nullptr) { // Check if the username already exists in the linked list
+            cout << "Username already exists. Please try again and choose a different name.\n";
+        }
+    } while (username.find(' ') != string::npos || findUserRecordByUsername(trim(username)) != nullptr);
+
+    bool emailExists;
+    do {
+        cout << "Email \t\t\t: ";
+        getline(cin, email);
+
+        // Ensure that the email contains the '@' symbol
+        if (email.find('@') == string::npos) {
+            cout << "Invalid email format. Please use a valid email address.\n\n";
+            continue; // Go to the next iteration of the loop if the email format is invalid
+        }
+
+        // Check if the email already exists in the linked list
+        emailExists = (findUserRecordByEmail(trim(email)) != nullptr);
+
+        if (emailExists) {
+            cout << "Email already exists. Please try again with a different email.\n\n";
+        }
+    } while (email.find('@') == string::npos || emailExists);
+        cout << "Address \t\t: ";
+        getline(cin, address);
+
+        // Ensure that the address is stored as a single column without line breaks
+        size_t found = address.find('\n');
+        while (found != string::npos)
+        {
+            address.replace(found, 1, " ");
+            found = address.find('\n');
+        }
+
+        cout << "Contact Number \t\t: ";
+        getline(cin, contactNumber);
+
+        do
+        {
+            cout << "Password \t\t: ";
+            getline(cin, password);
+            cout << "Confirm Password \t: ";
+            getline(cin, cpassword);
+
+            if (password != cpassword)
+            {
+                cout << "Passwords do not match. Please try again.\n\n"
+                     << endl;
+            }
+        } while (password != cpassword);
+
+        ofstream reg("user records.txt", ios::app);
+        reg << username << ' ' << email << ' ' << '"' << address << '"' << ' ' << contactNumber << ' ' << password << ' ' << cpassword << '\n';
+        reg.close();
+        
+        // Save user data to linked list
+    	addUserRecord(username, email, address, contactNumber, password);
+        system("cls");
+        cout << "\nRegistration Successful\n";
+    }
+
+    void forgetPassword() {
+    string input;
+    cout << "Enter your username or email \t: ";
+    getline(cin, input);
+
+    UserRecord* userRecord = findUserRecord(trim(input));
+    if (userRecord != nullptr) {
+        cout << "Your password is \t\t: " << userRecord->password << endl;
+    } else {
+        cout << "User not found. Please check your username or email." << endl;
+    }
+
+    system("pause");
+    system("cls");
+}
+
+    bool isLoggedIn() const
+    {
+        return loggedIn;
+    }
+
+    UserRecord* getCurrentUserRecord(const string& usernameOrEmail) {
+        UserRecord* current = userRecordHead;
+        while (current != nullptr) {
+            if (current->username == usernameOrEmail || current->email == usernameOrEmail) {
+                return current;
+            }
+            current = current->next;
+        }
+        return nullptr; // User record not found
+    }
+
+};
 // Cart cart;
 struct MenuItem
 {
     string name;
     float price;
     string category;
-    MenuItem() : name(""), price(0.0), category("") {}
-    MenuItem(string n, float p, string c) : name(n), price(p), category(c) {}
+    int quantity; // Add this line
+    MenuItem() : name(""), price(0.0), category(""), quantity(1) {} // Initialize quantity to 1
+    MenuItem(string n, float p, string c) : name(n), price(p), category(c), quantity(1) {} // Initialize quantity to 1
 };
 
 struct Node
@@ -88,8 +349,6 @@ void deleteMenuItem(Node *&head, const string &name)
     delete curr;
     cout << "Item \"" << name << "\" deleted successfully." << endl;
 }
-
-
 
 void countSort(Node *&head, int pos){
     Node *temp = head;
@@ -891,10 +1150,13 @@ public:
 
 // inheritance
 class Cart : public PaymentMethod{
+private: User& user;
 
 public:
     vector<Node*> items;
     float totalCost = 0.0f;
+
+    Cart(User& userRef) : user(userRef) { } // constructor
 
 void clearCart() {
     // Iterate through the items vector and delete each node
@@ -905,8 +1167,7 @@ void clearCart() {
     items.clear();
     // Reset the total cost
     totalCost = 0.0f;
-}
-                // end of clearCart
+}// end of clearCart
     
 void addToCart(Node* head, bool isSorted) {
     cout << "\nSelect a food item by entering its number: ";
@@ -923,21 +1184,20 @@ void addToCart(Node* head, bool isSorted) {
 
             // Create a new Node for the cart
             Node* cartItem = new Node(temp->data);
-            float originalPrice = cartItem->data.price;
-            cartItem->data.price *= quantity; // Adjust price for quantity
+            cartItem->data.quantity = quantity; // Set the quantity for the cart item
+            float originalPrice = cartItem->data.price / quantity; // Adjust the price per unit
+            cartItem->data.price *= quantity; // Set the total price for the quantity
 
             // Check if the item is already in the cart
             bool itemFound = false;
             for (auto& item : items) {
-                if (item->data.name == cartItem->data.name) {
-                    // Update existing item
-                    int existingQuantity = item->data.price / originalPrice;
-                    int newQuantity = existingQuantity + quantity;
-                    item->data.price = originalPrice * newQuantity;
+                 if (item->data.name == cartItem->data.name) {
+                    item->data.quantity += quantity;
+                    item->data.price += cartItem->data.price;
                     delete cartItem; // Delete the newly created node as we don't need it
                     itemFound = true;
                     break;
-                }
+        }
             }
 
             if (!itemFound) {
@@ -974,12 +1234,10 @@ void addToCart(Node* head, bool isSorted) {
             cout << string(50, '-') << endl;
 
             for (size_t i = 0; i < items.size(); ++i) {
-                float originalPrice = items[i]->data.price / (items[i]->data.price / items[i]->data.price);
-                int quantity = items[i]->data.price / originalPrice;
                 cout << left << setw(5) << (i + 1)
-                     << setw(20) << items[i]->data.name 
-                     << setw(10) << quantity
-                     << setw(15) << fixed << setprecision(2) << items[i]->data.price << endl;
+                << setw(20) << items[i]->data.name 
+                << setw(10) << items[i]->data.quantity
+                << setw(15) << fixed << setprecision(2) << items[i]->data.price << endl;
             }
             cout << string(50, '-') << endl;
             cout << "Total Cost: RM" << fixed << setprecision(2) << totalCost << endl;
@@ -988,6 +1246,8 @@ void addToCart(Node* head, bool isSorted) {
             cin >> choice;
             if (toupper(choice) == 'Y') {
                 processPayment();
+                // User user;
+                // updateSalesCount();
                 // updateSalesCount(user);
                 // updateOrderHistory(); // Add this line to update order history
                  clearCart();
@@ -1055,9 +1315,36 @@ void addToCart(Node* head, bool isSorted) {
         // Process payment logic (you can implement your own payment logic here)
         cout << "\nProcessing payment..." << endl;
         cout << "Payment successful. Thank you for your purchase!" << endl;
+        User user; // Create a User object
+        updateSalesCount(); // Pass the User object to updateSalesCount
         system("pause");
         system("cls");
     }
+
+    void updateSalesCount() {
+    ofstream salesReport("sales_report.txt", ios::app);
+    if (!salesReport) {
+        cout << "Error opening sales report file." << endl;
+        return;
+    }
+
+    salesReport << "================ Sales Report ================" << endl;
+    salesReport << "User: " << user.getUsername() << endl;
+    salesReport << "Address: " << user.getAddress() << endl;
+    salesReport << "Order Details:" << endl;
+
+    for (const auto& item : items) {
+        salesReport << "- " << item->data.name
+                    << " (Quantity: " << item->data.quantity
+                    << ", Price per unit: RM" << fixed << setprecision(2)
+                    << item->data.price / item->data.quantity << ")" << endl;
+    }
+
+    salesReport << "Total Cost: RM" << fixed << setprecision(2) << totalCost << endl;
+    salesReport << "=============================================" << endl;
+    salesReport.close();
+}
+    
 };
 
 
@@ -1298,244 +1585,7 @@ void goBackToMenu(Node *&head, Cart& cart, Restaurant &R) {
 
 
 
-struct UserRecord {
-	
-    string username;
-    string email;
-    string address;
-    string contactNumber;
-    string password;
-    UserRecord* next; // Pointer to the next node in the linked list
 
-	// containing all the user information stored in its member variables (means store in one node)
-    UserRecord(const string& username, const string& email, const string& address, const string& contactNumber, const string& password)
-        : username(username), email(email), address(address), contactNumber(contactNumber), password(password), next(nullptr) {}
-};
-
-class User
-{
-private:
-    string username;
-    string email;
-    string address;
-    string contactNumber;
-    string password;
-    string cpassword;
-    string inputUsername;
-    string inputPassword;
-    string existingUsername;
-    string existingEmail;
-    bool loggedIn;
-
-    bool isValueExists(const string &filename, const string &valueToCheck);
-
-    // Helper function to trim leading and trailing whitespaces
-    string trim(const string &str) {
-        size_t first = str.find_first_not_of(' ');
-        if (string::npos == first) {
-            return "";
-        }
-        size_t last = str.find_last_not_of(' ');
-        return str.substr(first, (last - first + 1));
-    }
-    
-    // Helper function to find a user record in the linked list
-    UserRecord* findUserRecord(const string& usernameOrEmail) {
-        UserRecord* current = userRecordHead;
-        while (current != nullptr) {
-            if (current->username == usernameOrEmail || current->email == usernameOrEmail) {
-                return current;
-            }
-            current = current->next;
-        }
-        return nullptr; // User record not found
-    }
-    
-        // Helper function to find a user record with a given username
-    UserRecord* findUserRecordByUsername(const string& username) {
-        UserRecord* current = userRecordHead;
-        while (current != nullptr) {
-            if (current->username == username) {
-                return current;
-            }
-            current = current->next;
-        }
-        return nullptr; // User record not found
-    }
-
-    // Helper function to find a user record with a given email
-    UserRecord* findUserRecordByEmail(const string& email) {
-        UserRecord* current = userRecordHead;
-        while (current != nullptr) {
-            if (current->email == email) {
-                return current;
-            }
-            current = current->next;
-        }
-        return nullptr; // User record not found
-    }
-    
-//    Restaurant R;
-//    Node* head = nullptr;
-    //static void welcomePage(User& user, Restaurant& R, Node*& head);
-	UserRecord* userRecordHead;
-	
-public:
-	void initializeUserRecords() {
-    readUserRecordsFromFile(); // Load user records from the file
-}
-     User() : loggedIn(false), userRecordHead(nullptr) { readUserRecordsFromFile();}
-
-	 void addUserRecord(const string& username, const string& email, const string& address, const string& contactNumber, const string& password) {
-     UserRecord* newRecord = new UserRecord(username, email, address, contactNumber, password);
-
-        if (userRecordHead == nullptr) {
-            userRecordHead = newRecord;
-        } else {
-            UserRecord* current = userRecordHead;
-            while (current->next != nullptr) {
-                current = current->next;
-            }
-            current->next = newRecord;
-        }
-    }
-
-    void readUserRecordsFromFile() {
-        ifstream file("user records.txt");
-        string line;
-        while (getline(file, line)) {
-            stringstream ss(line);
-            string username, email, address, contactNumber, password, cpassword;
-            ss >> username >> email;
-            ss.ignore(1, '"');
-            getline(ss, address, '"');
-            ss >> contactNumber >> password >> cpassword;
-            addUserRecord(username, email, address, contactNumber, password);
-        }
-        file.close();
-    }
-	
-    void login() {
-    system("cls");
-    cout << "User Login" << endl;
-    cout << "USERNAME or EMAIL  : ";
-    getline(cin, inputUsername);
-    cout << "PASSWORD           : ";
-    getline(cin, inputPassword);
-
-    UserRecord* userRecord = findUserRecord(trim(inputUsername));
-    if (userRecord != nullptr && userRecord->password == inputPassword) {
-        system("cls");
-        username = userRecord->username;
-        address = userRecord->address;
-        cout << "\nHello " << username << "\n<LOGIN SUCCESSFUL>\nThanks for logging in Restaurant Fusion Fare Delights\n";
-        loggedIn = true;
-        //welcomePage(*this, R, head);
-    } else {
-        cout << "\nLOGIN ERROR\nPlease check again your username or email and password\n";
-    }
-}     // end of login
-
-    void logout()
-    {
-        loggedIn = false;
-    }
-
-    void registration()
-    {
-        system("cls");
-        cout << "User Registration\n"
-             << endl;
-        // Prompt user until a valid single-word username is entered
-        do {
-        cout << "Username (Single-Word) \t: ";
-        getline(cin, username);
-
-        // Check if the name contains any space
-        if (username.find(' ') != string::npos) {
-            cout << "\nInvalid username format. Please use a single word without spaces.\n";
-        } else if (findUserRecordByUsername(trim(username)) != nullptr) { // Check if the username already exists in the linked list
-            cout << "Username already exists. Please try again and choose a different name.\n";
-        }
-    } while (username.find(' ') != string::npos || findUserRecordByUsername(trim(username)) != nullptr);
-
-    bool emailExists;
-    do {
-        cout << "Email \t\t\t: ";
-        getline(cin, email);
-
-        // Ensure that the email contains the '@' symbol
-        if (email.find('@') == string::npos) {
-            cout << "Invalid email format. Please use a valid email address.\n\n";
-            continue; // Go to the next iteration of the loop if the email format is invalid
-        }
-
-        // Check if the email already exists in the linked list
-        emailExists = (findUserRecordByEmail(trim(email)) != nullptr);
-
-        if (emailExists) {
-            cout << "Email already exists. Please try again with a different email.\n\n";
-        }
-    } while (email.find('@') == string::npos || emailExists);
-        cout << "Address \t\t: ";
-        getline(cin, address);
-
-        // Ensure that the address is stored as a single column without line breaks
-        size_t found = address.find('\n');
-        while (found != string::npos)
-        {
-            address.replace(found, 1, " ");
-            found = address.find('\n');
-        }
-
-        cout << "Contact Number \t\t: ";
-        getline(cin, contactNumber);
-
-        do
-        {
-            cout << "Password \t\t: ";
-            getline(cin, password);
-            cout << "Confirm Password \t: ";
-            getline(cin, cpassword);
-
-            if (password != cpassword)
-            {
-                cout << "Passwords do not match. Please try again.\n\n"
-                     << endl;
-            }
-        } while (password != cpassword);
-
-        ofstream reg("user records.txt", ios::app);
-        reg << username << ' ' << email << ' ' << '"' << address << '"' << ' ' << contactNumber << ' ' << password << ' ' << cpassword << '\n';
-        reg.close();
-        
-        // Save user data to linked list
-    	addUserRecord(username, email, address, contactNumber, password);
-        system("cls");
-        cout << "\nRegistration Successful\n";
-    }
-
-    void forgetPassword() {
-    string input;
-    cout << "Enter your username or email \t: ";
-    getline(cin, input);
-
-    UserRecord* userRecord = findUserRecord(trim(input));
-    if (userRecord != nullptr) {
-        cout << "Your password is \t\t: " << userRecord->password << endl;
-    } else {
-        cout << "User not found. Please check your username or email." << endl;
-    }
-
-    system("pause");
-    system("cls");
-}
-
-    bool isLoggedIn() const
-    {
-        return loggedIn;
-    }
-};
 
 //function declare
 //void welcomePage(User& user, Restaurant R, Node*& head);
@@ -1600,9 +1650,9 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart)
 int main()
 {
     Node *head = nullptr;
-    Cart cart;  
-    Restaurant R(cart);  
     User user;
+    Cart cart(user);  
+    Restaurant R(cart);  
     user.initializeUserRecords();
     welcomePage(user, R, head, cart);
 
