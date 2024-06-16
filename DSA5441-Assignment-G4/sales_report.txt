@@ -60,3 +60,51 @@ Order Details:
 - yuhan (Quantity: 5, Price per unit: RM88.00)
 Total Cost: RM482.50
 =============================================
+================ Sales Report ================
+User: tete
+Address: jalan tun fatimah juju
+Order Details:
+- Fried_Rice (Quantity: 3, Price per unit: RM7.00)
+- Teh_O_limau (Quantity: 3, Price per unit: RM10.00)
+Total Cost: RM51.00
+=============================================
+================ Sales Report ================
+User: wewe
+Address: jalan yuhan yuhan
+Order Details:
+- laici_kang (Quantity: 35, Price per unit: RM2.40)
+- yuhan (Quantity: 35, Price per unit: RM88.00)
+Total Cost: RM3164.00
+=============================================
+================ Sales Report ================
+User: thi
+Address: thi thi
+Order Details:
+- laici_kang (Quantity: 5, Price per unit: RM2.40)
+- Milo_cincau (Quantity: 1, Price per unit: RM1.50)
+Total Cost: RM13.50
+=============================================
+================ Sales Report ================
+User: check
+Address: 000 check
+Order Details:
+- Milo(cold) (Quantity: 12, Price per unit: RM3.50)
+- Prawn_Mee (Quantity: 12, Price per unit: RM6.50)
+Total Cost: RM120.00
+=============================================
+================ Sales Report ================
+User: qwqw
+Address: qyqyqyqy oioi
+Order Details:
+- laici_kang (Quantity: 35, Price per unit: RM2.40)
+- Milo_cincau (Quantity: 21, Price per unit: RM1.50)
+Total Cost: RM115.50
+=============================================
+================ Sales Report ================
+User: aa
+Address: aa aaa 
+Order Details:
+- Milo(cold) (Quantity: 12, Price per unit: RM3.50)
+- Teh_ais (Quantity: 10, Price per unit: RM2.00)
+Total Cost: RM62.00
+=============================================

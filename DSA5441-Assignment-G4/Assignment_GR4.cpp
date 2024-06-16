@@ -1164,6 +1164,7 @@ public:
 
     Cart(User& userRef) : user(userRef) { } // constructor
 
+
 void clearCart() {
     // Iterate through the items vector and delete each node
     for (auto& item : items) {
@@ -1344,6 +1345,7 @@ void removeFromCart() {
         cout << "Payment successful. Thank you for your purchase!" << endl;
         User user; // Create a User object
         updateSalesCount(); // Pass the User object to updateSalesCount
+        updateInventory(items); // Add this line to update the inventory
         system("pause");
         system("cls");
     }
@@ -1360,6 +1362,8 @@ void removeFromCart() {
     salesReport << "Address: " << user.getAddress() << endl;
     salesReport << "Order Details:" << endl;
 
+    
+
     for (const auto& item : items) {
         salesReport << "- " << item->data.name
                     << " (Quantity: " << item->data.quantity
@@ -1371,7 +1375,90 @@ void removeFromCart() {
     salesReport << "=============================================" << endl;
     salesReport.close();
 }
+
+void initializeInventoryFile() {
+    ifstream existingInventory("Inventory.txt");
+    if (existingInventory.good()) {
+        existingInventory.close();
+        cout << "Inventory file already exists. Skipping initialization." << endl;
+        return;
+    }
+    existingInventory.close();
+
+    ifstream menuFile("Menu.txt");
+    ofstream inventoryFile("Inventory.txt");
     
+    if (!menuFile) {
+        cout << "Error opening Menu.txt" << endl;
+        return;
+    }
+    if (!inventoryFile) {
+        cout << "Error creating Inventory.txt" << endl;
+        return;
+    }
+
+    string name, category;
+    float price;
+    int count = 0;
+
+    while (menuFile >> name >> price >> category) {
+        inventoryFile << name << " 0" << endl;  // Initialize quantity to 0
+        count++;
+    }
+
+    menuFile.close();
+    inventoryFile.close();
+
+    cout << "Initialized inventory with " << count << " items." << endl;
+}
+
+void updateInventory(const vector<Node*>& items) {
+    ifstream inFile("Inventory.txt");
+    ofstream outFile("TempInventory.txt");
+    
+    if (!inFile) {
+        cout << "Error opening Inventory.txt for reading." << endl;
+        return;
+    }
+    if (!outFile) {
+        cout << "Error creating TempInventory.txt" << endl;
+        return;
+    }
+
+    string name;
+    int quantity;
+    int updatedCount = 0;
+
+    while (inFile >> name >> quantity) {
+        bool found = false;
+        for (const auto& item : items) {
+            if (item->data.name == name) {
+                quantity += item->data.quantity;
+                found = true;
+                updatedCount++;
+                break;
+            }
+        }
+        outFile << name << " " << quantity << endl;
+        if (found) {
+            cout << "Updated " << name << " to " << quantity << endl;
+        }
+    }
+
+    inFile.close();
+    outFile.close();
+
+    if (remove("Inventory.txt") != 0) {
+        cout << "Error deleting old Inventory.txt" << endl;
+        return;
+    }
+    if (rename("TempInventory.txt", "Inventory.txt") != 0) {
+        cout << "Error renaming TempInventory.txt to Inventory.txt" << endl;
+        return;
+    }
+
+    
+}
 };
 
 
@@ -1681,6 +1768,7 @@ int main()
     Cart cart(user);  
     Restaurant R(cart);  
     user.initializeUserRecords();
+    cart.initializeInventoryFile();
     welcomePage(user, R, head, cart);
 
 
