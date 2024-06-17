@@ -108,3 +108,25 @@ Order Details:
 - Teh_ais (Quantity: 10, Price per unit: RM2.00)
 Total Cost: RM62.00
 =============================================
+================ Sales Report ================
+User: aida
+Address: jalan hahaha yuyu
+Order Details:
+- yuhan (Quantity: 5, Price per unit: RM88.00)
+- Milo_cincau (Quantity: 1, Price per unit: RM1.50)
+Total Cost: RM441.50
+=============================================
+================ Sales Report ================
+User: jj
+Address: jj lim sg
+Order Details:
+- Milo_cincau (Quantity: 10, Price per unit: RM1.50)
+Total Cost: RM15.00
+=============================================
+================ Sales Report ================
+User: jay
+Address: jay chou
+Order Details:
+- Mee_Soup (Quantity: 4, Price per unit: RM6.00)
+Total Cost: RM24.00
+=============================================

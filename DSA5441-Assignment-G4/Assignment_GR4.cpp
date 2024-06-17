@@ -15,7 +15,7 @@ int currentSortState = 0; // 0: unsorted, 1: price low to high, 2: price high to
 class Restaurant;  // Forward declaration
 class Cart;
 class User;
-
+class Receipt;
 struct UserRecord {
 	
     string username;
@@ -1164,6 +1164,25 @@ public:
 
     Cart(User& userRef) : user(userRef) { } // constructor
 
+void ratingAndFeedback() {
+        ofstream ratingFile("ratings_and_feedback.txt", ios::app);
+        if (ratingFile.is_open()) {
+            int rating;
+            string feedback;
+            cout << "Please rate your experience (1-5): ";
+            cin >> rating;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Please provide your feedback: ";
+            getline(cin, feedback);
+
+            ratingFile << user.getUsername() << "," << rating << ",\"" << feedback << "\"\n";
+            cout << "Thank you for your rating and feedback!" << endl;
+        } else {
+            cout << "Unable to open the file to store rating and feedback." << endl;
+        }
+        ratingFile.close();
+    }
+
 
 void clearCart() {
     // Iterate through the items vector and delete each node
@@ -1343,11 +1362,24 @@ void removeFromCart() {
         // Process payment logic (you can implement your own payment logic here)
         cout << "\nProcessing payment..." << endl;
         cout << "Payment successful. Thank you for your purchase!" << endl;
+         // Generate and display the receipt
+        //Receipt receipt;
+        //receipt.generateReceipt(user, *this);  // 'this' refers to the current Cart object
         User user; // Create a User object
         updateSalesCount(); // Pass the User object to updateSalesCount
         updateInventory(items); // Add this line to update the inventory
-        system("pause");
-        system("cls");
+        char rating;
+        cout << "Would you like to rate us ? [Y/N] : ";
+        cin >> rating;
+        if (rating=='Y'||rating=='y'){
+            ratingAndFeedback();
+        }
+        else {
+            system("pause");
+            system("cls");
+        }
+        
+        
     }
 
     void updateSalesCount() {
@@ -1440,9 +1472,9 @@ void updateInventory(const vector<Node*>& items) {
             }
         }
         outFile << name << " " << quantity << endl;
-        if (found) {
-            cout << "Updated " << name << " to " << quantity << endl;
-        }
+        // if (found) {
+        //     cout << "Updated " << name << " to " << quantity << endl;
+        // }
     }
 
     inFile.close();
@@ -1456,10 +1488,45 @@ void updateInventory(const vector<Node*>& items) {
         cout << "Error renaming TempInventory.txt to Inventory.txt" << endl;
         return;
     }
-
-    
 }
+
+    // friend class Receipt;
 };
+
+// class Receipt {
+// public:
+//     Receipt() {}
+
+//     void generateReceipt(const User& user, const Cart& cart) {
+//         system("cls");
+//         cout << "========== RECEIPT ==========" << endl;
+//         cout << "Name        : " << user.getUsername() << endl;
+//         cout << "Address     : " << user.getAddress() << endl;
+//         cout << "\nOrder Details:" << endl;
+//         cout << string(30, '-') << endl;
+//         cout << left << setw(20) << "Item" 
+//              << setw(10) << "Quantity" 
+//              << setw(10) << "Price" 
+//              << setw(10) << "Total" << endl;
+//         cout << string(30, '-') << endl;
+
+//         float totalCost = 0.0;
+//         for (const auto& item : cart.items) {
+//             float itemTotal = item->data.price;
+//             cout << left << setw(20) << item->data.name 
+//                  << setw(10) << item->data.quantity
+//                  << setw(10) << fixed << setprecision(2) << (itemTotal / item->data.quantity)
+//                  << setw(10) << itemTotal << endl;
+//             totalCost += itemTotal;
+//         }
+
+//         cout << string(30, '-') << endl;
+//         cout << "Total Cost: RM" << fixed << setprecision(2) << totalCost << endl;
+//         cout << "=============================" << endl;
+//         system("pause");
+//         system("cls");
+//     }
+// };
 
 
 class Restaurant { 
@@ -1549,6 +1616,8 @@ Restaurant(Cart& c) : cart(c), originalHead(nullptr), sortedHead(nullptr) {}
         }
     }
 };//end of class restaurant
+
+
 
 void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
 	//Restaurant R;
@@ -1697,13 +1766,6 @@ void goBackToMenu(Node *&head, Cart& cart, Restaurant &R) {
     }
 }
 
-
-
-
-
-//function declare
-//void welcomePage(User& user, Restaurant R, Node*& head);
-
 void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart)
 {
     int choice;
@@ -1760,6 +1822,8 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart)
 
     } while (choice != 5); // end of do
 } // end of welcome
+
+
 
 int main()
 {
