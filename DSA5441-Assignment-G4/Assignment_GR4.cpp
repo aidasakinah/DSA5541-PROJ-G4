@@ -1271,6 +1271,24 @@ void addToCart(Node* head, bool isSorted) {
     cout << "Invalid item number." << endl;
 }
 
+// Overloaded addToCart function (accepts item name and head pointer)
+void addToCart(const string& itemName, Node*& head) {
+    Node* temp = head;
+    bool found = false;
+    while (temp != nullptr) {
+        if (toLowerCase(temp->data.name) == toLowerCase(itemName)) {
+            found = true;
+            // Add item to cart (similar to the existing addToCart implementation)
+            break;
+        }
+        temp = temp->next;
+    }
+
+    if (!found) {
+        cout << "Item not found in the menu." << endl;
+    }
+}
+
  void displayCart() {
         if (items.empty()) {
             cout << "Your cart is empty." << endl;
