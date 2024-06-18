@@ -1766,7 +1766,295 @@ void goBackToMenu(Node *&head, Cart& cart, Restaurant &R) {
     }
 }
 
-void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart)
+class Admin
+{
+private:
+    string adminId;
+    string adminPass;
+
+public:
+    Admin() : adminId("admin"), adminPass("admin123") {}
+    // friend class welcomePage;
+
+    void adminlogin()
+    {
+        int count = 0;
+        string inputId, inputPass;
+
+        system("cls");
+        cout << "---------------------------------------------------------" << endl;
+        cout << "\t>>>>>>>>>> Administrator Login <<<<<<<<<<" << endl;
+        cout << "---------------------------------------------------------" << endl;
+        cout << "Admin ID \t: ";
+        getline(cin, inputId);
+        cout << "Password \t: ";
+        getline(cin, inputPass);
+
+        if (inputId == adminId && inputPass == adminPass)
+        {
+            system("cls"); // clearing the screen
+            cout << "<ADMIN LOGIN SUCCESSFUL>\n";
+            cout << "Welcome, Admin " << endl;
+            system("pause"); // pause the screen
+        }
+        else
+        {
+            do
+            {
+                system("cls");
+                cout << "Incorrect login details. Please try again." << endl; // if the user enter wrong password, it will loop again
+                cout << "\n---------------------------------------------------------" << endl;
+                cout << "\t>>>>>>>>>> Administrator Login <<<<<<<<<<" << endl;
+                cout << "---------------------------------------------------------" << endl;
+                cout << "\nAdmin ID \t: ";
+                getline(cin, inputId);
+                cout << "Password \t: ";
+                getline(cin, inputPass);
+
+            } while (inputId != adminId || inputPass != adminPass); // end of do-while loop
+        }                                                           // end of if else
+
+    } // end of void adminlogin
+};
+
+// class Adminpage
+// this class is for admin to manage the menu :D
+class Adminpage : public Admin
+{
+private:
+    int choice;
+    int back;
+    Node* head; // Head of the linked list
+
+protected:
+public:
+    Adminpage() : head(nullptr) {}
+
+    // Destructor to free linked list memory
+    ~Adminpage()
+    {
+        Node* current = head;
+        while (current != nullptr)
+        {
+            Node* next = current->next;
+            delete current;
+            current = next;
+        }
+    }
+
+    // Friend function declarations
+    friend void addMenuItem(Node *&head, Cart &cart, Restaurant &R);
+    friend void deleteMenuItem(Node *&head, const string &name);
+
+    void displayAdmin()
+    {
+        User user;
+        Admin admin;
+        Adminpage ap;
+
+        system("cls");
+        cout << "---------------------------------------------------------" << endl;
+        cout << "\t>>>>>>>>>> Admin Page <<<<<<<<<<" << endl;
+        cout << "---------------------------------------------------------" << endl;
+        cout << "1. Manage Menu" << endl;
+        cout << "2. Manage User" << endl;
+        cout << "3. Manage Order" << endl;
+        cout << "4. Exit" << endl;
+        cout << "\nEnter your choice : ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            manageMenu();
+            break;
+        case 2:
+            manageUser();
+            break;
+        case 3:
+            system("cls");
+            //C.displaySalesReport();
+            returntopage();
+            break;
+        case 4:
+            cout << "Exiting, Returning to Main Menu" << endl;
+            // welcomePage(user, admin, ap, R, C);
+            // returntoWelcomePage();
+            // back = 2;
+            system("pause");
+            system("cls");
+            return;
+            break;
+        }
+    }
+
+    void manageMenu()
+    {
+        int pick;
+        User user;
+        Cart cart(user);
+        Restaurant R(cart);
+        cout << "Enter [1] to add item to menu OR [2] to remove item from menu OR [3] to search for item from menu : ";
+        cin >> pick;
+        manageMenu(pick, cart, R); // Call the overloaded function
+    }
+
+    void manageMenu(int pick, Cart &cart, Restaurant &R)
+    {
+        string itemName;
+        char searchAgain;
+
+        system("cls"); // clearing the screen
+
+        if (pick == 1)
+        {
+            addMenuItem(head, cart, R); // Call the friend function
+        }
+        else if (pick == 2)
+        {
+            cout << "Enter the name of the item to delete: ";
+            cin.ignore();
+            getline(cin, itemName);
+            deleteMenuItem(head, itemName); // Call the friend function
+            displayUpdatedMenu(); // Display the updated menu
+        }
+        else if (pick == 3)
+        {
+            do
+            {
+                cout << "Enter the name of the item to search: ";
+                cin.ignore();
+                getline(cin, itemName);
+                searchItem(itemName);
+                cout << "Do you want to search again? [Y/N]: ";
+                cin >> searchAgain;
+            } while (toupper(searchAgain) == 'Y'); // end of do while
+        }
+        else
+        {
+            cout << "Invalid choice. Please try again.\n";
+        }
+
+        returntopage();
+    }
+
+    void displayUpdatedMenu()
+    {
+        Node* temp = head;
+        int itemNumber = 0;
+
+        cout << "Updated Menu" << endl;
+        while (temp != nullptr)
+        {
+            cout << ++itemNumber << ") " << setw(30) << left << temp->data.name << " RM" << fixed << setprecision(2) << temp->data.price << " " << temp->data.category << endl;
+            temp = temp->next;
+        }
+    }
+
+    void manageUser()
+    {
+        string userName;
+        cout << "Enter the username of the user to remove: ";
+        cin.ignore(); // Clear the newline character from the buffer
+        getline(cin, userName);
+
+        ifstream inFile("user records.txt");
+        ofstream outFile("temp_users.txt");
+
+        string line;
+        bool found = false;
+
+        while (getline(inFile, line))
+        {
+            stringstream ss(line);
+            string existingUsername;
+            ss >> existingUsername;
+
+            if (existingUsername == userName)
+            {
+                // Skip the line to delete the user
+                found = true;
+                continue;
+            }
+            outFile << line << endl;
+        }
+
+        // closes files
+        inFile.close();
+        outFile.close();
+
+        if (found)
+        {
+            remove("user records.txt");
+            rename("temp_users.txt", "user records.txt");
+            cout << "User removed successfully.\n";
+        }
+        else
+        {
+            cout << "User not found.\n";
+            remove("temp_users.txt");
+        }
+
+        returntopage();
+    }
+
+    // Function to convert a string to lowercase
+    string toLowercase(const string &str)
+    {
+        string result = str;
+        transform(result.begin(), result.end(), result.begin(), ::tolower);
+        return result;
+    }
+
+    bool searchItem(const string &itemName)
+    {
+        Node* temp = head;
+        string itemNameLower = toLowercase(itemName);
+        bool found = false;
+
+        while (temp != nullptr)
+        {
+            string nameLower = toLowercase(temp->data.name);
+            if (nameLower.find(itemNameLower) != string::npos)
+            {
+                cout << "Item found in the menu: " << temp->data.name << " RM" << fixed << setprecision(2) << temp->data.price << " " << temp->data.category << endl;
+                found = true;
+            }
+            temp = temp->next;
+        }
+
+        if (!found)
+        {
+            cout << "Item not found in the menu.\n";
+        }
+
+        return found;
+    }
+
+    void returntopage()
+    {
+        system("pause");
+        system("cls");
+        cout << "Please press [1] to return to Admin Page OR [2] to return to Welcome Page : ";
+        cin >> back;
+
+        if (back == 1)
+        {
+            displayAdmin();
+        }
+        else if (back == 2)
+        {
+            return;
+        }
+        else
+        {
+            cout << "Invalid choice. Please try again.\n";
+        }
+    }
+
+}; // end of class Adminpage
+
+void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart, Admin &admin, Adminpage &ap)
 {
     int choice;
     do
@@ -1803,8 +2091,8 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart)
                 user.forgetPassword();
                 break;
             case 4:
-//                admin.adminlogin();
-//                ap.displayAdmin();
+               admin.adminlogin();
+               ap.displayAdmin();
                 break;
             case 5:
                 cout << "Thank you for visiting Restaurant Fusion Fare Delights." << endl;
@@ -1823,17 +2111,17 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart)
     } while (choice != 5); // end of do
 } // end of welcome
 
-
-
 int main()
 {
     Node *head = nullptr;
     User user;
     Cart cart(user);  
-    Restaurant R(cart);  
+    Restaurant R(cart); 
+    Admin admin;
+    Adminpage ap; 
     user.initializeUserRecords();
     cart.initializeInventoryFile();
-    welcomePage(user, R, head, cart);
+    welcomePage(user, R, head, cart, admin, ap);
 
 
     // Clean up dynamically allocated memory
