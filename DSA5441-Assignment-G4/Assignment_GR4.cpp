@@ -316,6 +316,32 @@ void insertMenuItem(Node *&head, MenuItem item)
     curr->next = newNode;
 }
 
+// Overloaded function declaration
+void insertMenuItem(Node*& head, MenuItem item, int position);
+
+// Overloaded function definition
+void insertMenuItem(Node*& head, MenuItem item, int position) {
+    Node* newNode = new Node(item);
+    if (position == 1) {
+        newNode->next = head;
+        head = newNode;
+        return;
+    }
+
+    Node* temp = head;
+    for (int i = 1; i < position - 1 && temp != nullptr; i++) {
+        temp = temp->next;
+    }
+
+    if (temp == nullptr) {
+        cout << "Invalid position." << endl;
+        return;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
 void deleteMenuItem(Node *&head, const string &name)
 {
     if (!head)
@@ -894,6 +920,32 @@ void searchResults(Node *head, float minPrice, float maxPrice) {
     }
 }
 
+// Overloaded function to search for items by category
+void searchResults(Node* head, const string& category) {
+    if (!head) {
+        cout << "The menu is empty." << endl;
+        return;
+    }
+
+    cout << "----------------------------------------" << endl;
+    cout << "     Search Results by Category        " << endl;
+    cout << "----------------------------------------" << endl;
+
+    bool found = false;
+    Node* temp = head;
+    while (temp) {
+        if (temp->data.category == category) {
+            cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << endl;
+            found = true;
+        }
+        temp = temp->next;
+    }
+
+    if (!found) {
+        cout << "No items found in the specified category." << endl;
+    }
+}
+
 void goBackToMenu(Node *&head, Cart &cart, Restaurant &R);
 void showMenuOptions(Node *&head, Cart &cart, Restaurant &R);
 
@@ -1243,6 +1295,24 @@ void addToCart(Node* head, bool isSorted) {
         counter++;
     }
     cout << "Invalid item number." << endl;
+}
+
+// Overloaded addToCart function (accepts item name and head pointer)
+void addToCart(const string& itemName, Node*& head) {
+    Node* temp = head;
+    bool found = false;
+    while (temp != nullptr) {
+        if (toLowerCase(temp->data.name) == toLowerCase(itemName)) {
+            found = true;
+            // Add item to cart (similar to the existing addToCart implementation)
+            break;
+        }
+        temp = temp->next;
+    }
+
+    if (!found) {
+        cout << "Item not found in the menu." << endl;
+    }
 }
 
  void displayCart() {
