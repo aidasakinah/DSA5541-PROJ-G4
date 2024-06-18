@@ -316,6 +316,32 @@ void insertMenuItem(Node *&head, MenuItem item)
     curr->next = newNode;
 }
 
+// Overloaded function declaration
+void insertMenuItem(Node*& head, MenuItem item, int position);
+
+// Overloaded function definition
+void insertMenuItem(Node*& head, MenuItem item, int position) {
+    Node* newNode = new Node(item);
+    if (position == 1) {
+        newNode->next = head;
+        head = newNode;
+        return;
+    }
+
+    Node* temp = head;
+    for (int i = 1; i < position - 1 && temp != nullptr; i++) {
+        temp = temp->next;
+    }
+
+    if (temp == nullptr) {
+        cout << "Invalid position." << endl;
+        return;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
 void deleteMenuItem(Node *&head, const string &name)
 {
     if (!head)
