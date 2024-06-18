@@ -12,21 +12,22 @@
 using namespace std;
 const int MAX_ITEM = 100;
 int currentSortState = 0; // 0: unsorted, 1: price low to high, 2: price high to low, 3: alphabetical
-class Restaurant;  // Forward declaration
+class Restaurant;         // Forward declaration
 class Cart;
 class User;
 class Receipt;
-struct UserRecord {
-	
+struct UserRecord
+{
+
     string username;
     string email;
     string address;
     string contactNumber;
     string password;
-    UserRecord* next; // Pointer to the next node in the linked list
+    UserRecord *next; // Pointer to the next node in the linked list
 
-	// containing all the user information stored in its member variables (means store in one node)
-    UserRecord(const string& username, const string& email, const string& address, const string& contactNumber, const string& password)
+    // containing all the user information stored in its member variables (means store in one node)
+    UserRecord(const string &username, const string &email, const string &address, const string &contactNumber, const string &password)
         : username(username), email(email), address(address), contactNumber(contactNumber), password(password), next(nullptr) {}
 };
 
@@ -48,33 +49,41 @@ private:
     bool isValueExists(const string &filename, const string &valueToCheck);
 
     // Helper function to trim leading and trailing whitespaces
-    string trim(const string &str) {
+    string trim(const string &str)
+    {
         size_t first = str.find_first_not_of(' ');
-        if (string::npos == first) {
+        if (string::npos == first)
+        {
             return "";
         }
         size_t last = str.find_last_not_of(' ');
         return str.substr(first, (last - first + 1));
     }
-    
+
     // Helper function to find a user record in the linked list
-    UserRecord* findUserRecord(const string& userRecord) {
-    UserRecord* current = userRecordHead;
-    while (current != nullptr) {
-        string record = current->username + "#" + current->password;
-        if (record == userRecord) {
-            return current;
+    UserRecord *findUserRecord(const string &userRecord)
+    {
+        UserRecord *current = userRecordHead;
+        while (current != nullptr)
+        {
+            string record = current->username + "#" + current->password;
+            if (record == userRecord)
+            {
+                return current;
+            }
+            current = current->next;
         }
-        current = current->next;
+        return nullptr; // User record not found
     }
-    return nullptr; // User record not found
-}
-    
-        // Helper function to find a user record with a given username
-    UserRecord* findUserRecordByUsername(const string& username) {
-        UserRecord* current = userRecordHead;
-        while (current != nullptr) {
-            if (current->username == username) {
+
+    // Helper function to find a user record with a given username
+    UserRecord *findUserRecordByUsername(const string &username)
+    {
+        UserRecord *current = userRecordHead;
+        while (current != nullptr)
+        {
+            if (current->username == username)
+            {
                 return current;
             }
             current = current->next;
@@ -83,54 +92,67 @@ private:
     }
 
     // Helper function to find a user record with a given email
-    UserRecord* findUserRecordByEmail(const string& email) {
-        UserRecord* current = userRecordHead;
-        while (current != nullptr) {
-            if (current->email == email) {
+    UserRecord *findUserRecordByEmail(const string &email)
+    {
+        UserRecord *current = userRecordHead;
+        while (current != nullptr)
+        {
+            if (current->email == email)
+            {
                 return current;
             }
             current = current->next;
         }
         return nullptr; // User record not found
     }
-    
-//    Restaurant R;
-//    Node* head = nullptr;
-    //static void welcomePage(User& user, Restaurant& R, Node*& head);
-	UserRecord* userRecordHead;
-	
+
+    //    Restaurant R;
+    //    Node* head = nullptr;
+    // static void welcomePage(User& user, Restaurant& R, Node*& head);
+    UserRecord *userRecordHead;
+
 public:
-     // Getter functions
-    string getUsername() const {
+    // Getter functions
+    string getUsername() const
+    {
         return username;
     }
 
-    string getAddress() const {
+    string getAddress() const
+    {
         return address;
     }
-	void initializeUserRecords() {
-    readUserRecordsFromFile(); // Load user records from the file
-}
-     User() : loggedIn(false), userRecordHead(nullptr) { readUserRecordsFromFile();}
+    void initializeUserRecords()
+    {
+        readUserRecordsFromFile(); // Load user records from the file
+    }
+    User() : loggedIn(false), userRecordHead(nullptr) { readUserRecordsFromFile(); }
 
-	 void addUserRecord(const string& username, const string& email, const string& address, const string& contactNumber, const string& password) {
-     UserRecord* newRecord = new UserRecord(username, email, address, contactNumber, password);
+    void addUserRecord(const string &username, const string &email, const string &address, const string &contactNumber, const string &password)
+    {
+        UserRecord *newRecord = new UserRecord(username, email, address, contactNumber, password);
 
-        if (userRecordHead == nullptr) {
+        if (userRecordHead == nullptr)
+        {
             userRecordHead = newRecord;
-        } else {
-            UserRecord* current = userRecordHead;
-            while (current->next != nullptr) {
+        }
+        else
+        {
+            UserRecord *current = userRecordHead;
+            while (current->next != nullptr)
+            {
                 current = current->next;
             }
             current->next = newRecord;
         }
     }
 
-    void readUserRecordsFromFile() {
+    void readUserRecordsFromFile()
+    {
         ifstream file("user records.txt");
         string line;
-        while (getline(file, line)) {
+        while (getline(file, line))
+        {
             stringstream ss(line);
             string username, email, address, contactNumber, password, cpassword;
             ss >> username >> email;
@@ -141,32 +163,39 @@ public:
         }
         file.close();
     }
-	
-void login() {
-    system("cls");
-    cout << "User Login" << endl;
-    cout << "USERNAME or EMAIL  : ";
-    getline(cin, inputUsername);
-    cout << "PASSWORD           : ";
-    getline(cin, inputPassword);
 
-    UserRecord* userRecord = findUserRecordByUsername(trim(inputUsername));
-    if (userRecord != nullptr) {
-        string record = userRecord->username + "#" + userRecord->password;
-        string inputRecord = trim(inputUsername) + "#" + inputPassword;
-        if (record == inputRecord) {
-            system("cls");
-            username = userRecord->username;
-            address = userRecord->address;
-            cout << "\nHello " << username << "\n<LOGIN SUCCESSFUL>\nThanks for logging in Restaurant Fusion Fare Delights\n";
-            loggedIn = true;
-        } else {
+    void login()
+    {
+        system("cls");
+        cout << "User Login" << endl;
+        cout << "USERNAME or EMAIL  : ";
+        getline(cin, inputUsername);
+        cout << "PASSWORD           : ";
+        getline(cin, inputPassword);
+
+        UserRecord *userRecord = findUserRecordByUsername(trim(inputUsername));
+        if (userRecord != nullptr)
+        {
+            string record = userRecord->username + "#" + userRecord->password;
+            string inputRecord = trim(inputUsername) + "#" + inputPassword;
+            if (record == inputRecord)
+            {
+                system("cls");
+                username = userRecord->username;
+                address = userRecord->address;
+                cout << "\nHello " << username << "\n<LOGIN SUCCESSFUL>\nThanks for logging in Restaurant Fusion Fare Delights\n";
+                loggedIn = true;
+            }
+            else
+            {
+                cout << "\nLOGIN ERROR\nPlease check again your username or email and password\n";
+            }
+        }
+        else
+        {
             cout << "\nLOGIN ERROR\nPlease check again your username or email and password\n";
         }
-    } else {
-        cout << "\nLOGIN ERROR\nPlease check again your username or email and password\n";
-    }
-}// end of login
+    } // end of login
 
     void logout()
     {
@@ -179,36 +208,43 @@ void login() {
         cout << "User Registration\n"
              << endl;
         // Prompt user until a valid single-word username is entered
-        do {
-        cout << "Username (Single-Word) \t: ";
-        getline(cin, username);
+        do
+        {
+            cout << "Username (Single-Word) \t: ";
+            getline(cin, username);
 
-        // Check if the name contains any space
-        if (username.find(' ') != string::npos) {
-            cout << "\nInvalid username format. Please use a single word without spaces.\n";
-        } else if (findUserRecordByUsername(trim(username)) != nullptr) { // Check if the username already exists in the linked list
-            cout << "Username already exists. Please try again and choose a different name.\n";
-        }
-    } while (username.find(' ') != string::npos || findUserRecordByUsername(trim(username)) != nullptr);
+            // Check if the name contains any space
+            if (username.find(' ') != string::npos)
+            {
+                cout << "\nInvalid username format. Please use a single word without spaces.\n";
+            }
+            else if (findUserRecordByUsername(trim(username)) != nullptr)
+            { // Check if the username already exists in the linked list
+                cout << "Username already exists. Please try again and choose a different name.\n";
+            }
+        } while (username.find(' ') != string::npos || findUserRecordByUsername(trim(username)) != nullptr);
 
-    bool emailExists;
-    do {
-        cout << "Email \t\t\t: ";
-        getline(cin, email);
+        bool emailExists;
+        do
+        {
+            cout << "Email \t\t\t: ";
+            getline(cin, email);
 
-        // Ensure that the email contains the '@' symbol
-        if (email.find('@') == string::npos) {
-            cout << "Invalid email format. Please use a valid email address.\n\n";
-            continue; // Go to the next iteration of the loop if the email format is invalid
-        }
+            // Ensure that the email contains the '@' symbol
+            if (email.find('@') == string::npos)
+            {
+                cout << "Invalid email format. Please use a valid email address.\n\n";
+                continue; // Go to the next iteration of the loop if the email format is invalid
+            }
 
-        // Check if the email already exists in the linked list
-        emailExists = (findUserRecordByEmail(trim(email)) != nullptr);
+            // Check if the email already exists in the linked list
+            emailExists = (findUserRecordByEmail(trim(email)) != nullptr);
 
-        if (emailExists) {
-            cout << "Email already exists. Please try again with a different email.\n\n";
-        }
-    } while (email.find('@') == string::npos || emailExists);
+            if (emailExists)
+            {
+                cout << "Email already exists. Please try again with a different email.\n\n";
+            }
+        } while (email.find('@') == string::npos || emailExists);
         cout << "Address \t\t: ";
         getline(cin, address);
 
@@ -240,45 +276,51 @@ void login() {
         ofstream reg("user records.txt", ios::app);
         reg << username << ' ' << email << ' ' << '"' << address << '"' << ' ' << contactNumber << ' ' << password << ' ' << cpassword << '\n';
         reg.close();
-        
+
         // Save user data to linked list
-    	addUserRecord(username, email, address, contactNumber, password);
+        addUserRecord(username, email, address, contactNumber, password);
         system("cls");
         cout << "\nRegistration Successful\n";
     }
 
-    void forgetPassword() {
-    string input;
-    cout << "Enter your username or email \t: ";
-    getline(cin, input);
+    void forgetPassword()
+    {
+        string input;
+        cout << "Enter your username or email \t: ";
+        getline(cin, input);
 
-    UserRecord* userRecord = findUserRecord(trim(input));
-    if (userRecord != nullptr) {
-        cout << "Your password is \t\t: " << userRecord->password << endl;
-    } else {
-        cout << "User not found. Please check your username or email." << endl;
+        UserRecord *userRecord = findUserRecord(trim(input));
+        if (userRecord != nullptr)
+        {
+            cout << "Your password is \t\t: " << userRecord->password << endl;
+        }
+        else
+        {
+            cout << "User not found. Please check your username or email." << endl;
+        }
+
+        system("pause");
+        system("cls");
     }
-
-    system("pause");
-    system("cls");
-}
 
     bool isLoggedIn() const
     {
         return loggedIn;
     }
 
-    UserRecord* getCurrentUserRecord(const string& usernameOrEmail) {
-        UserRecord* current = userRecordHead;
-        while (current != nullptr) {
-            if (current->username == usernameOrEmail || current->email == usernameOrEmail) {
+    UserRecord *getCurrentUserRecord(const string &usernameOrEmail)
+    {
+        UserRecord *current = userRecordHead;
+        while (current != nullptr)
+        {
+            if (current->username == usernameOrEmail || current->email == usernameOrEmail)
+            {
                 return current;
             }
             current = current->next;
         }
         return nullptr; // User record not found
     }
-
 };
 // Cart cart;
 struct MenuItem
@@ -286,8 +328,8 @@ struct MenuItem
     string name;
     float price;
     string category;
-    int quantity; // Add this line
-    MenuItem() : name(""), price(0.0), category(""), quantity(1) {} // Initialize quantity to 1
+    int quantity;                                                                          // Add this line
+    MenuItem() : name(""), price(0.0), category(""), quantity(1) {}                        // Initialize quantity to 1
     MenuItem(string n, float p, string c) : name(n), price(p), category(c), quantity(1) {} // Initialize quantity to 1
 };
 
@@ -298,6 +340,22 @@ struct Node
 
     Node() : next(nullptr) {}
     Node(MenuItem item) : data(item), next(nullptr) {}
+};
+
+struct Staff
+{
+    string username;
+    string position;
+
+    Staff(string u, string p) : username(u), position(p) {}
+};
+
+struct StaffNode
+{
+    Staff data;
+    StaffNode *next;
+
+    StaffNode(Staff s) : data(s), next(nullptr) {}
 };
 
 void insertMenuItem(Node *&head, MenuItem item)
@@ -317,23 +375,27 @@ void insertMenuItem(Node *&head, MenuItem item)
 }
 
 // Overloaded function declaration
-void insertMenuItem(Node*& head, MenuItem item, int position);
+void insertMenuItem(Node *&head, MenuItem item, int position);
 
 // Overloaded function definition
-void insertMenuItem(Node*& head, MenuItem item, int position) {
-    Node* newNode = new Node(item);
-    if (position == 1) {
+void insertMenuItem(Node *&head, MenuItem item, int position)
+{
+    Node *newNode = new Node(item);
+    if (position == 1)
+    {
         newNode->next = head;
         head = newNode;
         return;
     }
 
-    Node* temp = head;
-    for (int i = 1; i < position - 1 && temp != nullptr; i++) {
+    Node *temp = head;
+    for (int i = 1; i < position - 1 && temp != nullptr; i++)
+    {
         temp = temp->next;
     }
 
-    if (temp == nullptr) {
+    if (temp == nullptr)
+    {
         cout << "Invalid position." << endl;
         return;
     }
@@ -359,7 +421,6 @@ void deleteMenuItem(Node *&head, const string &name)
         head = curr->next;
         delete curr;
         cout << "Item \"" << name << "\" deleted successfully." << endl;
-        return;
     }
 
     // Traverse the linked list to find the node to delete
@@ -444,20 +505,22 @@ void radixSort(Node *&head)
     }
 }
 
-
-void countSortDescending(Node *&head, int pos){
+void countSortDescending(Node *&head, int pos)
+{
     Node *temp = head;
     Node *nodeList[MAX_ITEM];
     int count = 0;
 
     // Store all nodes in an array
-    while (temp) {
+    while (temp)
+    {
         nodeList[count++] = temp;
         temp = temp->next;
     }
 
     // Sort the array based on the character at the current position in descending order
-    sort(nodeList, nodeList + count, [pos](Node *a, Node *b) {
+    sort(nodeList, nodeList + count, [pos](Node *a, Node *b)
+         {
         if (pos >= a->data.name.length() && pos >= b->data.name.length()) {
             return false;
         }
@@ -469,18 +532,20 @@ void countSortDescending(Node *&head, int pos){
         }
         else {
             return a->data.name[pos] > b->data.name[pos];
-        }
-    });
+        } });
 
     // Rebuild the linked list from the sorted array
     Node *newHead = nullptr;
     Node *tail = nullptr;
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++)
+    {
         nodeList[i]->next = nullptr;
-        if (newHead == nullptr) {
+        if (newHead == nullptr)
+        {
             newHead = nodeList[i];
         }
-        else {
+        else
+        {
             tail->next = nodeList[i];
         }
         tail = nodeList[i];
@@ -489,21 +554,25 @@ void countSortDescending(Node *&head, int pos){
     head = newHead;
 }
 
-void radixSortDescending(Node *&head) {
+void radixSortDescending(Node *&head)
+{
     int maxLen = 0;
     Node *temp = head;
-    while (temp) {
+    while (temp)
+    {
         maxLen = max(maxLen, static_cast<int>(temp->data.name.length()));
         temp = temp->next;
     }
 
-    for (int pos = maxLen - 1; pos >= 0; pos--) {
+    for (int pos = maxLen - 1; pos >= 0; pos--)
+    {
         countSortDescending(head, pos);
     }
 }
 
 // Custom sorting algorithm: Find minimum and swap
-void customSort(Node *&head){
+void customSort(Node *&head)
+{
     if (!head)
         return;
 
@@ -529,7 +598,8 @@ void customSort(Node *&head){
 }
 
 // Bucket sort in ascending order
-void bucketSortAscending(Node *&head){
+void bucketSortAscending(Node *&head)
+{
     if (!head)
     {
         cout << "The menu is empty. Nothing to sort." << endl;
@@ -598,7 +668,8 @@ void bucketSortAscending(Node *&head){
 }
 
 // Custom sorting algorithm: Find maximum and swap
-void customSortDescending(Node *&head){
+void customSortDescending(Node *&head)
+{
     if (!head)
         return;
 
@@ -620,7 +691,8 @@ void customSortDescending(Node *&head){
 }
 
 // Bucket sort in descending order
-void bucketSortDescending(Node *&head){
+void bucketSortDescending(Node *&head)
+{
     if (!head)
     {
         cout << "The menu is empty. Nothing to sort." << endl;
@@ -689,8 +761,10 @@ void bucketSortDescending(Node *&head){
 }
 
 // to print menu from txt file
-void printMenu(Node *head){
-    if (head == nullptr) {
+void printMenu(Node *head)
+{
+    if (head == nullptr)
+    {
         cout << "The menu is empty." << endl;
         return;
     }
@@ -703,10 +777,11 @@ void printMenu(Node *head){
 
     Node *temp = head;
     int itemNumber = 1;
-    while (temp != nullptr) {
+    while (temp != nullptr)
+    {
         cout << left << setw(5) << (to_string(itemNumber) + ")")
-             << setw(30) << temp->data.name 
-             << setw(15) << fixed << setprecision(2) << temp->data.price 
+             << setw(30) << temp->data.name
+             << setw(15) << fixed << setprecision(2) << temp->data.price
              << setw(20) << temp->data.category << endl;
         temp = temp->next;
         itemNumber++;
@@ -714,14 +789,16 @@ void printMenu(Node *head){
 }
 
 // Utility function to convert a string to lowercase
-string toLowerCase(const string &str){
+string toLowerCase(const string &str)
+{
     string lowerStr = str;
     transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
     return lowerStr;
 }
 
 // Ternary Search
-void ternarySearch(Node *head, const string &key){
+void ternarySearch(Node *head, const string &key)
+{
     if (!head)
         return;
 
@@ -798,7 +875,8 @@ void ternarySearch(Node *head, const string &key){
 }
 
 // Jump Search
-void jumpSearch(Node *head, const string &key){
+void jumpSearch(Node *head, const string &key)
+{
     if (!head)
         return;
 
@@ -882,7 +960,8 @@ void jumpSearch(Node *head, const string &key){
     }
 }
 
-void searchResults(Node *head, const string &itemName, int searchType){
+void searchResults(Node *head, const string &itemName, int searchType)
+{
     if (searchType == 1)
     {
         cout << "----------------------------------------" << endl;
@@ -900,29 +979,35 @@ void searchResults(Node *head, const string &itemName, int searchType){
 }
 
 // Overloaded function to search by price range
-void searchResults(Node *head, float minPrice, float maxPrice) {
+void searchResults(Node *head, float minPrice, float maxPrice)
+{
     cout << "----------------------------------------" << endl;
     cout << "      Price Range Search Results        " << endl;
     cout << "----------------------------------------" << endl;
 
     Node *temp = head;
     bool found = false;
-    while (temp) {
-        if (temp->data.price >= minPrice && temp->data.price <= maxPrice) {
+    while (temp)
+    {
+        if (temp->data.price >= minPrice && temp->data.price <= maxPrice)
+        {
             cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << " (" << temp->data.category << ")" << endl;
             found = true;
         }
         temp = temp->next;
     }
 
-    if (!found) {
+    if (!found)
+    {
         cout << "No items found in the specified price range." << endl;
     }
 }
 
 // Overloaded function to search for items by category
-void searchResults(Node* head, const string& category) {
-    if (!head) {
+void searchResults(Node *head, const string &category)
+{
+    if (!head)
+    {
         cout << "The menu is empty." << endl;
         return;
     }
@@ -932,16 +1017,19 @@ void searchResults(Node* head, const string& category) {
     cout << "----------------------------------------" << endl;
 
     bool found = false;
-    Node* temp = head;
-    while (temp) {
-        if (temp->data.category == category) {
+    Node *temp = head;
+    while (temp)
+    {
+        if (temp->data.category == category)
+        {
             cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << endl;
             found = true;
         }
         temp = temp->next;
     }
 
-    if (!found) {
+    if (!found)
+    {
         cout << "No items found in the specified category." << endl;
     }
 }
@@ -949,7 +1037,8 @@ void searchResults(Node* head, const string& category) {
 void goBackToMenu(Node *&head, Cart &cart, Restaurant &R);
 void showMenuOptions(Node *&head, Cart &cart, Restaurant &R);
 
-void addMenuItem(Node *&head, Cart &cart, Restaurant &R){
+void addMenuItem(Node *&head, Cart &cart, Restaurant &R)
+{
     string itemName;
 
     system("cls");
@@ -983,7 +1072,7 @@ void addMenuItem(Node *&head, Cart &cart, Restaurant &R){
 
         // Display the updated menu
         printMenu(head);
-        goBackToMenu(head,cart,R);
+        goBackToMenu(head, cart, R);
     }
     else
     {
@@ -993,7 +1082,8 @@ void addMenuItem(Node *&head, Cart &cart, Restaurant &R){
 
 // menu sorting algorithm
 // finished
-void algorithmSortMenu(Node *&head, Cart &cart, Restaurant &R){
+void algorithmSortMenu(Node *&head, Cart &cart, Restaurant &R)
+{
     int sortalgo, radixChoice, bucketChoice;
     system("cls");
     cout << "----------------------------------------" << endl;
@@ -1022,19 +1112,18 @@ void algorithmSortMenu(Node *&head, Cart &cart, Restaurant &R){
             system("cls");
             radixSort(head);
             printMenu(head);
-            goBackToMenu(head,cart,R);
-            algorithmSortMenu(head,cart,R);
+            goBackToMenu(head, cart, R);
+            algorithmSortMenu(head, cart, R);
         }
         else if (radixChoice == 2)
         {
             system("cls");
             radixSortDescending(head);
             printMenu(head);
-            goBackToMenu(head,cart,R);
+            goBackToMenu(head, cart, R);
         }
         else if (radixChoice == 3)
         {
-            
         }
     }
     else if (sortalgo == 2)
@@ -1054,25 +1143,25 @@ void algorithmSortMenu(Node *&head, Cart &cart, Restaurant &R){
             system("cls");
             bucketSortAscending(head);
             printMenu(head);
-            goBackToMenu(head,cart,R);
+            goBackToMenu(head, cart, R);
         }
         else if (bucketChoice == 2)
         {
             system("cls");
             bucketSortDescending(head);
             printMenu(head);
-            goBackToMenu(head,cart,R);
+            goBackToMenu(head, cart, R);
         }
         else if (bucketChoice == 3)
         {
-            algorithmSortMenu(head,cart,R);
+            algorithmSortMenu(head, cart, R);
         }
     }
     else if (sortalgo == 3)
     {
         system("cls");
         printMenu(head);
-        goBackToMenu(head,cart,R);
+        goBackToMenu(head, cart, R);
     }
     else if (sortalgo == 4)
     {
@@ -1081,12 +1170,13 @@ void algorithmSortMenu(Node *&head, Cart &cart, Restaurant &R){
     else
     {
         cout << "Invalid choice. Please select again." << endl;
-        algorithmSortMenu(head,cart,R);
+        algorithmSortMenu(head, cart, R);
     }
 }
 
 // menu search algorithm
-void algorithmSearchMenu(Node *&head, Cart &cart, Restaurant &R){
+void algorithmSearchMenu(Node *&head, Cart &cart, Restaurant &R)
+{
     int searchType;
     system("cls");
     cout << "----------------------------------------" << endl;
@@ -1107,7 +1197,7 @@ void algorithmSearchMenu(Node *&head, Cart &cart, Restaurant &R){
         cin.ignore();
         getline(cin, itemName);
         searchResults(head, itemName, searchType);
-        goBackToMenu(head,cart,R);
+        goBackToMenu(head, cart, R);
     }
     else if (searchType == 2)
     {
@@ -1117,9 +1207,10 @@ void algorithmSearchMenu(Node *&head, Cart &cart, Restaurant &R){
         cin.ignore();
         getline(cin, itemName);
         searchResults(head, itemName, searchType);
-        goBackToMenu(head,cart,R);
+        goBackToMenu(head, cart, R);
     }
-    else if (searchType == 3) {
+    else if (searchType == 3)
+    {
         system("cls");
         float minPrice, maxPrice;
         cout << "Enter the minimum price: RM ";
@@ -1127,34 +1218,43 @@ void algorithmSearchMenu(Node *&head, Cart &cart, Restaurant &R){
         cout << "Enter the maximum price: RM ";
         cin >> maxPrice;
         searchResults(head, minPrice, maxPrice);
-        goBackToMenu(head,cart,R);
+        goBackToMenu(head, cart, R);
     }
     else if (searchType == 4)
     {
-        showMenuOptions(head,cart, R);
+        showMenuOptions(head, cart, R);
     }
     else
     {
         cout << "Invalid choice. Please select again." << endl;
-        algorithmSearchMenu(head,cart,R);
+        algorithmSearchMenu(head, cart, R);
     }
 }
 
-void printSortedMenu(Node *head, int displayChoice) {
-    if (head == nullptr) {
+void printSortedMenu(Node *head, int displayChoice)
+{
+    if (head == nullptr)
+    {
         cout << "The menu is empty." << endl;
         return;
     }
 
     cout << string(70, '-') << endl;
     cout << setw(35) << "Menu";
-    if (displayChoice == 1) {
+    if (displayChoice == 1)
+    {
         cout << " (Sorted by Price: Low to High)";
-    } else if (displayChoice == 2) {
+    }
+    else if (displayChoice == 2)
+    {
         cout << " (Sorted by Price: High to Low)";
-    } else if (displayChoice == 3) {
+    }
+    else if (displayChoice == 3)
+    {
         cout << " (Sorted Alphabetically: A-Z)";
-    } else if (displayChoice == 4) {
+    }
+    else if (displayChoice == 4)
+    {
         cout << " (Sorted Alphabetically: Z-A)";
     }
     cout << endl;
@@ -1164,10 +1264,11 @@ void printSortedMenu(Node *head, int displayChoice) {
 
     Node *temp = head;
     int itemNumber = 1;
-    while (temp != nullptr) {
+    while (temp != nullptr)
+    {
         cout << left << setw(5) << (to_string(itemNumber) + ")")
-             << setw(30) << temp->data.name 
-             << setw(15) << fixed << setprecision(2) << temp->data.price 
+             << setw(30) << temp->data.name
+             << setw(15) << fixed << setprecision(2) << temp->data.price
              << setw(20) << temp->data.category << endl;
         temp = temp->next;
         itemNumber++;
@@ -1207,18 +1308,22 @@ public:
 };
 
 // inheritance
-class Cart : public PaymentMethod{
-private: User& user;
+class Cart : public PaymentMethod
+{
+private:
+    User &user;
 
 public:
-    vector<Node*> items;
+    vector<Node *> items;
     float totalCost = 0.0f;
 
-    Cart(User& userRef) : user(userRef) { } // constructor
+    Cart(User &userRef) : user(userRef) {} // constructor
 
-void ratingAndFeedback() {
+    void ratingAndFeedback()
+    {
         ofstream ratingFile("ratings_and_feedback.txt", ios::app);
-        if (ratingFile.is_open()) {
+        if (ratingFile.is_open())
+        {
             int rating;
             string feedback;
             cout << "Please rate your experience (1-5): ";
@@ -1229,179 +1334,206 @@ void ratingAndFeedback() {
 
             ratingFile << user.getUsername() << "," << rating << ",\"" << feedback << "\"\n";
             cout << "Thank you for your rating and feedback!" << endl;
-        } else {
+        }
+        else
+        {
             cout << "Unable to open the file to store rating and feedback." << endl;
         }
         ratingFile.close();
     }
 
-
-void clearCart() {
-    // Iterate through the items vector and delete each node
-    for (auto& item : items) {
-        delete item;
-    }
-    // Clear the items vector
-    items.clear();
-    // Reset the total cost
-    totalCost = 0.0f;
-}// end of clearCart
-    
-void addToCart(Node* head, bool isSorted) {
-    cout << "\nSelect a food item by entering its number: ";
-    int itemNumber;
-    cin >> itemNumber;
-    Node* temp = head;
-    int counter = 1;
-    while (temp != nullptr) {
-        if (counter == itemNumber) {
-            cout << "You selected: " << counter << ") " << temp->data.name << " RM" << fixed << setprecision(2) << temp->data.price << endl;
-            cout << "Enter the quantity: ";
-            int quantity;
-            cin >> quantity;
-
-            // Create a new Node for the cart
-           Node* cartItem = new Node(temp->data);
-           cartItem->data.quantity = quantity; // Set the quantity for the cart item
-           cartItem->data.price *= quantity; // Set the total price for the quantity
-
-            // Check if the item is already in the cart
-            bool itemFound = false;
-            for (auto& item : items) {
-                 if (item->data.name == cartItem->data.name) {
-                    item->data.quantity += quantity;
-                    item->data.price += cartItem->data.price;
-                    delete cartItem; // Delete the newly created node as we don't need it
-                    itemFound = true;
-                    break;
+    void clearCart()
+    {
+        // Iterate through the items vector and delete each node
+        for (auto &item : items)
+        {
+            delete item;
         }
-            }
+        // Clear the items vector
+        items.clear();
+        // Reset the total cost
+        totalCost = 0.0f;
+    } // end of clearCart
 
-            if (!itemFound) {
-                items.push_back(cartItem);
-            }
-            totalCost += cartItem->data.price;
-            cout << "Item added to cart. Current order total: RM" << fixed << setprecision(2) << totalCost << endl;
+    void addToCart(Node *head, bool isSorted)
+    {
+        cout << "\nSelect a food item by entering its number: ";
+        int itemNumber;
+        cin >> itemNumber;
+        Node *temp = head;
+        int counter = 1;
+        while (temp != nullptr)
+        {
+            if (counter == itemNumber)
+            {
+                cout << "You selected: " << counter << ") " << temp->data.name << " RM" << fixed << setprecision(2) << temp->data.price << endl;
+                cout << "Enter the quantity: ";
+                int quantity;
+                cin >> quantity;
 
-            char choice;
-            cout << "Would you like to add another item? [Y/N]: ";
-            cin >> choice;
-            if (toupper(choice) == 'Y') {
-                addToCart(head, isSorted); // Recursive call to add another item
+                // Create a new Node for the cart
+                Node *cartItem = new Node(temp->data);
+                cartItem->data.quantity = quantity; // Set the quantity for the cart item
+                cartItem->data.price *= quantity;   // Set the total price for the quantity
+
+                // Check if the item is already in the cart
+                bool itemFound = false;
+                for (auto &item : items)
+                {
+                    if (item->data.name == cartItem->data.name)
+                    {
+                        item->data.quantity += quantity;
+                        item->data.price += cartItem->data.price;
+                        delete cartItem; // Delete the newly created node as we don't need it
+                        itemFound = true;
+                        break;
+                    }
+                }
+
+                if (!itemFound)
+                {
+                    items.push_back(cartItem);
+                }
+                totalCost += cartItem->data.price;
+                cout << "Item added to cart. Current order total: RM" << fixed << setprecision(2) << totalCost << endl;
+
+                char choice;
+                cout << "Would you like to add another item? [Y/N]: ";
+                cin >> choice;
+                if (toupper(choice) == 'Y')
+                {
+                    addToCart(head, isSorted); // Recursive call to add another item
+                }
+                return;
             }
-            return;
+            temp = temp->next;
+            counter++;
         }
-        temp = temp->next;
-        counter++;
+        cout << "Invalid item number." << endl;
     }
-    cout << "Invalid item number." << endl;
-}
 
-// Overloaded addToCart function (accepts item name and head pointer)
-void addToCart(const string& itemName, Node*& head) {
-    Node* temp = head;
-    bool found = false;
-    while (temp != nullptr) {
-        if (toLowerCase(temp->data.name) == toLowerCase(itemName)) {
-            found = true;
-            // Add item to cart (similar to the existing addToCart implementation)
-            break;
+    // Overloaded addToCart function (accepts item name and head pointer)
+    void addToCart(const string &itemName, Node *&head)
+    {
+        Node *temp = head;
+        bool found = false;
+        while (temp != nullptr)
+        {
+            if (toLowerCase(temp->data.name) == toLowerCase(itemName))
+            {
+                found = true;
+                // Add item to cart (similar to the existing addToCart implementation)
+                break;
+            }
+            temp = temp->next;
         }
-        temp = temp->next;
+
+        if (!found)
+        {
+            cout << "Item not found in the menu." << endl;
+        }
     }
 
-    if (!found) {
-        cout << "Item not found in the menu." << endl;
-    }
-}
-
- void displayCart() {
-        if (items.empty()) {
+    void displayCart()
+    {
+        if (items.empty())
+        {
             cout << "Your cart is empty." << endl;
-        } else {
+        }
+        else
+        {
             cout << "My Cart:" << endl;
             cout << string(50, '-') << endl;
-            cout << left << setw(5) << "No." 
-                 << setw(20) << "Name" 
-                 << setw(10) << "Quantity" 
+            cout << left << setw(5) << "No."
+                 << setw(20) << "Name"
+                 << setw(10) << "Quantity"
                  << setw(15) << "Price (RM)" << endl;
             cout << string(50, '-') << endl;
 
-            for (size_t i = 0; i < items.size(); ++i) {
+            for (size_t i = 0; i < items.size(); ++i)
+            {
                 cout << left << setw(5) << (i + 1)
-                << setw(20) << items[i]->data.name 
-                << setw(10) << items[i]->data.quantity
-                << setw(15) << fixed << setprecision(2) << items[i]->data.price << endl;
+                     << setw(20) << items[i]->data.name
+                     << setw(10) << items[i]->data.quantity
+                     << setw(15) << fixed << setprecision(2) << items[i]->data.price << endl;
             }
             cout << string(50, '-') << endl;
             cout << "Total Cost: RM" << fixed << setprecision(2) << totalCost << endl;
             char choice;
             cout << "Would you like to proceed to payment? (Y/N): " << endl;
             cin >> choice;
-            if (toupper(choice) == 'Y') {
+            if (toupper(choice) == 'Y')
+            {
                 processPayment();
                 // User user;
                 // updateSalesCount();
                 // updateSalesCount(user);
                 // updateOrderHistory(); // Add this line to update order history
-                 clearCart();
+                clearCart();
             }
         }
     }
 
-void removeFromCart() {
-    if (items.empty()) {
-        cout << "Your cart is empty. Nothing to remove." << endl;
-        return;
+    void removeFromCart()
+    {
+        if (items.empty())
+        {
+            cout << "Your cart is empty. Nothing to remove." << endl;
+            return;
+        }
+
+        displayCart();
+
+        int itemNumber;
+        cout << "\nEnter the number of the item you want to remove: ";
+        cin >> itemNumber;
+
+        if (itemNumber < 1 || itemNumber > items.size())
+        {
+            cout << "Invalid item number. Please try again." << endl;
+            return;
+        }
+
+        Node *selectedItem = items[itemNumber - 1];
+        int currentQuantity = selectedItem->data.quantity;
+        float pricePerUnit = selectedItem->data.price / currentQuantity;
+
+        int quantityToRemove;
+        cout << "How many quantity you want to delete? (Current quantity: " << currentQuantity << "): ";
+        cin >> quantityToRemove;
+
+        if (quantityToRemove <= 0 || quantityToRemove > currentQuantity)
+        {
+            cout << "Invalid quantity. Please try again." << endl;
+            return;
+        }
+
+        if (quantityToRemove == currentQuantity)
+        {
+            // Remove the entire item
+            totalCost -= selectedItem->data.price;
+            delete selectedItem;
+            items.erase(items.begin() + itemNumber - 1);
+            cout << "Item completely removed from cart." << endl;
+        }
+        else
+        {
+            // Update the quantity and price
+            selectedItem->data.quantity -= quantityToRemove;
+            float removedCost = selectedItem->data.price / currentQuantity * quantityToRemove;
+            selectedItem->data.price -= removedCost;
+            totalCost -= removedCost;
+            cout << "Quantity updated for the item." << endl;
+        }
+
+        cout << "Updated total: RM" << fixed << setprecision(2) << totalCost << endl;
+
+        // Display updated cart
+        cout << "\nUpdated Cart:" << endl;
+        displayCart();
     }
 
-    displayCart();
-
-    int itemNumber;
-    cout << "\nEnter the number of the item you want to remove: ";
-    cin >> itemNumber;
-
-    if (itemNumber < 1 || itemNumber > items.size()) {
-        cout << "Invalid item number. Please try again." << endl;
-        return;
-    }
-
-    Node* selectedItem = items[itemNumber - 1];
-    int currentQuantity = selectedItem->data.quantity;
-    float pricePerUnit = selectedItem->data.price / currentQuantity;
-
-    int quantityToRemove;
-    cout << "How many quantity you want to delete? (Current quantity: " << currentQuantity << "): ";
-    cin >> quantityToRemove;
-
-    if (quantityToRemove <= 0 || quantityToRemove > currentQuantity) {
-        cout << "Invalid quantity. Please try again." << endl;
-        return;
-    }
-
-    if (quantityToRemove == currentQuantity) {
-        // Remove the entire item
-        totalCost -= selectedItem->data.price;
-        delete selectedItem;
-        items.erase(items.begin() + itemNumber - 1);
-        cout << "Item completely removed from cart." << endl;
-    } else {
-        // Update the quantity and price
-        selectedItem->data.quantity -= quantityToRemove;
-        float removedCost = selectedItem->data.price / currentQuantity * quantityToRemove;
-        selectedItem->data.price -= removedCost;
-        totalCost -= removedCost;
-        cout << "Quantity updated for the item." << endl;
-    }
-
-    cout << "Updated total: RM" << fixed << setprecision(2) << totalCost << endl;
-    
-    // Display updated cart
-    cout << "\nUpdated Cart:" << endl;
-    displayCart();
-}
-
-        void processPayment()
+    void processPayment()
     {
         string cardHolderName, cardNumber, expirationDate, cvv;
         cin.ignore(); // Clear the newline character from the buffer
@@ -1432,133 +1564,147 @@ void removeFromCart() {
         // Process payment logic (you can implement your own payment logic here)
         cout << "\nProcessing payment..." << endl;
         cout << "Payment successful. Thank you for your purchase!" << endl;
-         // Generate and display the receipt
-        //Receipt receipt;
-        //receipt.generateReceipt(user, *this);  // 'this' refers to the current Cart object
-        User user; // Create a User object
-        updateSalesCount(); // Pass the User object to updateSalesCount
+        // Generate and display the receipt
+        // Receipt receipt;
+        // receipt.generateReceipt(user, *this);  // 'this' refers to the current Cart object
+        User user;              // Create a User object
+        updateSalesCount();     // Pass the User object to updateSalesCount
         updateInventory(items); // Add this line to update the inventory
         char rating;
         cout << "Would you like to rate us ? [Y/N] : ";
         cin >> rating;
-        if (rating=='Y'||rating=='y'){
+        if (rating == 'Y' || rating == 'y')
+        {
             ratingAndFeedback();
         }
-        else {
+        else
+        {
             system("pause");
             system("cls");
         }
-        
-        
     }
 
-    void updateSalesCount() {
-    ofstream salesReport("sales_report.txt", ios::app);
-    if (!salesReport) {
-        cout << "Error opening sales report file." << endl;
-        return;
-    }
-
-    salesReport << "================ Sales Report ================" << endl;
-    salesReport << "User: " << user.getUsername() << endl;
-    salesReport << "Address: " << user.getAddress() << endl;
-    salesReport << "Order Details:" << endl;
-
-    
-
-    for (const auto& item : items) {
-        salesReport << "- " << item->data.name
-                    << " (Quantity: " << item->data.quantity
-                    << ", Price per unit: RM" << fixed << setprecision(2)
-                    << item->data.price / item->data.quantity << ")" << endl;
-    }
-
-    salesReport << "Total Cost: RM" << fixed << setprecision(2) << totalCost << endl;
-    salesReport << "=============================================" << endl;
-    salesReport.close();
-}
-
-void initializeInventoryFile() {
-    ifstream existingInventory("Inventory.txt");
-    if (existingInventory.good()) {
-        existingInventory.close();
-        cout << "Inventory file already exists. Skipping initialization." << endl;
-        return;
-    }
-    existingInventory.close();
-
-    ifstream menuFile("Menu.txt");
-    ofstream inventoryFile("Inventory.txt");
-    
-    if (!menuFile) {
-        cout << "Error opening Menu.txt" << endl;
-        return;
-    }
-    if (!inventoryFile) {
-        cout << "Error creating Inventory.txt" << endl;
-        return;
-    }
-
-    string name, category;
-    float price;
-    int count = 0;
-
-    while (menuFile >> name >> price >> category) {
-        inventoryFile << name << " 0" << endl;  // Initialize quantity to 0
-        count++;
-    }
-
-    menuFile.close();
-    inventoryFile.close();
-
-    cout << "Initialized inventory with " << count << " items." << endl;
-}
-
-void updateInventory(const vector<Node*>& items) {
-    ifstream inFile("Inventory.txt");
-    ofstream outFile("TempInventory.txt");
-    
-    if (!inFile) {
-        cout << "Error opening Inventory.txt for reading." << endl;
-        return;
-    }
-    if (!outFile) {
-        cout << "Error creating TempInventory.txt" << endl;
-        return;
-    }
-
-    string name;
-    int quantity;
-    int updatedCount = 0;
-
-    while (inFile >> name >> quantity) {
-        bool found = false;
-        for (const auto& item : items) {
-            if (item->data.name == name) {
-                quantity += item->data.quantity;
-                found = true;
-                updatedCount++;
-                break;
-            }
+    void updateSalesCount()
+    {
+        ofstream salesReport("sales_report.txt", ios::app);
+        if (!salesReport)
+        {
+            cout << "Error opening sales report file." << endl;
+            return;
         }
-        outFile << name << " " << quantity << endl;
-        // if (found) {
-        //     cout << "Updated " << name << " to " << quantity << endl;
-        // }
+
+        salesReport << "================ Sales Report ================" << endl;
+        salesReport << "User: " << user.getUsername() << endl;
+        salesReport << "Address: " << user.getAddress() << endl;
+        salesReport << "Order Details:" << endl;
+
+        for (const auto &item : items)
+        {
+            salesReport << "- " << item->data.name
+                        << " (Quantity: " << item->data.quantity
+                        << ", Price per unit: RM" << fixed << setprecision(2)
+                        << item->data.price / item->data.quantity << ")" << endl;
+        }
+
+        salesReport << "Total Cost: RM" << fixed << setprecision(2) << totalCost << endl;
+        salesReport << "=============================================" << endl;
+        salesReport.close();
     }
 
-    inFile.close();
-    outFile.close();
+    void initializeInventoryFile()
+    {
+        ifstream existingInventory("Inventory.txt");
+        if (existingInventory.good())
+        {
+            existingInventory.close();
+            cout << "Inventory file already exists. Skipping initialization." << endl;
+            return;
+        }
+        existingInventory.close();
 
-    if (remove("Inventory.txt") != 0) {
-        cout << "Error deleting old Inventory.txt" << endl;
-        return;
+        ifstream menuFile("Menu.txt");
+        ofstream inventoryFile("Inventory.txt");
+
+        if (!menuFile)
+        {
+            cout << "Error opening Menu.txt" << endl;
+            return;
+        }
+        if (!inventoryFile)
+        {
+            cout << "Error creating Inventory.txt" << endl;
+            return;
+        }
+
+        string name, category;
+        float price;
+        int count = 0;
+
+        while (menuFile >> name >> price >> category)
+        {
+            inventoryFile << name << " 0" << endl; // Initialize quantity to 0
+            count++;
+        }
+
+        menuFile.close();
+        inventoryFile.close();
+
+        cout << "Initialized inventory with " << count << " items." << endl;
     }
-    if (rename("TempInventory.txt", "Inventory.txt") != 0) {
-        cout << "Error renaming TempInventory.txt to Inventory.txt" << endl;
-        return;
+
+    void updateInventory(const vector<Node *> &items)
+    {
+        ifstream inFile("Inventory.txt");
+        ofstream outFile("TempInventory.txt");
+
+        if (!inFile)
+        {
+            cout << "Error opening Inventory.txt for reading." << endl;
+            return;
+        }
+        if (!outFile)
+        {
+            cout << "Error creating TempInventory.txt" << endl;
+            return;
+        }
+
+        string name;
+        int quantity;
+        int updatedCount = 0;
+
+        while (inFile >> name >> quantity)
+        {
+            bool found = false;
+            for (const auto &item : items)
+            {
+                if (item->data.name == name)
+                {
+                    quantity += item->data.quantity;
+                    found = true;
+                    updatedCount++;
+                    break;
+                }
+            }
+            outFile << name << " " << quantity << endl;
+            // if (found) {
+            //     cout << "Updated " << name << " to " << quantity << endl;
+            // }
+        }
+
+        inFile.close();
+        outFile.close();
+
+        if (remove("Inventory.txt") != 0)
+        {
+            cout << "Error deleting old Inventory.txt" << endl;
+            return;
+        }
+        if (rename("TempInventory.txt", "Inventory.txt") != 0)
+        {
+            cout << "Error renaming TempInventory.txt to Inventory.txt" << endl;
+            return;
+        }
     }
-}
 
     // friend class Receipt;
 };
@@ -1574,16 +1720,16 @@ void updateInventory(const vector<Node*>& items) {
 //         cout << "Address     : " << user.getAddress() << endl;
 //         cout << "\nOrder Details:" << endl;
 //         cout << string(30, '-') << endl;
-//         cout << left << setw(20) << "Item" 
-//              << setw(10) << "Quantity" 
-//              << setw(10) << "Price" 
+//         cout << left << setw(20) << "Item"
+//              << setw(10) << "Quantity"
+//              << setw(10) << "Price"
 //              << setw(10) << "Total" << endl;
 //         cout << string(30, '-') << endl;
 
 //         float totalCost = 0.0;
 //         for (const auto& item : cart.items) {
 //             float itemTotal = item->data.price;
-//             cout << left << setw(20) << item->data.name 
+//             cout << left << setw(20) << item->data.name
 //                  << setw(10) << item->data.quantity
 //                  << setw(10) << fixed << setprecision(2) << (itemTotal / item->data.quantity)
 //                  << setw(10) << itemTotal << endl;
@@ -1598,31 +1744,34 @@ void updateInventory(const vector<Node*>& items) {
 //     }
 // };
 
-
-class Restaurant { 
+class Restaurant
+{
 private:
     float price, itemPrice;
     string itemName;
-	Cart& cart;
-    Node* originalHead;
-    Node* sortedHead;
+    Cart &cart;
+    Node *originalHead;
+    Node *sortedHead;
 
 public:
+    Restaurant(Cart &c) : cart(c), originalHead(nullptr), sortedHead(nullptr) {}
 
-Restaurant(Cart& c) : cart(c), originalHead(nullptr), sortedHead(nullptr) {}
-
-    void readFile(int displayChoice) {
-        if (originalHead == nullptr) {
+    void readFile(int displayChoice)
+    {
+        if (originalHead == nullptr)
+        {
             // Clear the existing list if any
-            while (originalHead != nullptr) {
-                Node* temp = originalHead;
+            while (originalHead != nullptr)
+            {
+                Node *temp = originalHead;
                 originalHead = originalHead->next;
                 delete temp;
             }
 
             string menuFileName = "Menu.txt";
             ifstream menuFile(menuFileName.c_str(), ios::in);
-            if (!menuFile) {
+            if (!menuFile)
+            {
                 cout << "File does not exist";
                 exit(1);
             }
@@ -1630,7 +1779,8 @@ Restaurant(Cart& c) : cart(c), originalHead(nullptr), sortedHead(nullptr) {}
             string name, category;
             float price;
 
-            while (menuFile >> name >> price >> category) {
+            while (menuFile >> name >> price >> category)
+            {
                 insertMenuItem(originalHead, MenuItem(name, price, category));
             }
 
@@ -1642,178 +1792,209 @@ Restaurant(Cart& c) : cart(c), originalHead(nullptr), sortedHead(nullptr) {}
         system("cls");
         cout << "Food and Beverage" << endl;
 
-        if (displayChoice == 0) {
+        if (displayChoice == 0)
+        {
             printMenu(originalHead);
-        } else {
+        }
+        else
+        {
             printSortedMenu(sortedHead, displayChoice);
         }
 
         char addcartchoice;
         cout << "\nWould you like to add items to the cart? [Y/N]: ";
         cin >> addcartchoice;
-         if (toupper(addcartchoice) == 'Y') {
-        if (displayChoice == 0) {
-            cart.addToCart(originalHead, false);
-        } else {
-            cart.addToCart(sortedHead, true);
+        if (toupper(addcartchoice) == 'Y')
+        {
+            if (displayChoice == 0)
+            {
+                cart.addToCart(originalHead, false);
+            }
+            else
+            {
+                cart.addToCart(sortedHead, true);
+            }
         }
     }
-}
-        void createSortedList(int displayChoice) {
+    void createSortedList(int displayChoice)
+    {
         // Delete previous sortedHead if it exists
-        while (sortedHead != nullptr) {
-            Node* temp = sortedHead;
+        while (sortedHead != nullptr)
+        {
+            Node *temp = sortedHead;
             sortedHead = sortedHead->next;
             delete temp;
         }
 
         // Create a new list by copying data from originalHead
-        Node* current = originalHead;
-        while (current != nullptr) {
+        Node *current = originalHead;
+        while (current != nullptr)
+        {
             insertMenuItem(sortedHead, current->data);
             current = current->next;
         }
 
         // Sort the new list based on displayChoice
-        if (displayChoice == 1) {
+        if (displayChoice == 1)
+        {
             bucketSortAscending(sortedHead);
-        } else if (displayChoice == 2) {
+        }
+        else if (displayChoice == 2)
+        {
             bucketSortDescending(sortedHead);
-        } else if (displayChoice == 3) {
+        }
+        else if (displayChoice == 3)
+        {
             radixSort(sortedHead);
-        } else if (displayChoice == 4) {
+        }
+        else if (displayChoice == 4)
+        {
             radixSortDescending(sortedHead);
         }
     }
-};//end of class restaurant
+}; // end of class restaurant
 
-
-
-void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
-	//Restaurant R;
-	//Cart cart;
+void showMenuOptions(Node *&head, Cart &cart, Restaurant &R)
+{
+    // Restaurant R;
+    // Cart cart;
     int choice;
     string itemName, line, itemCategory, itemToDelete;
     float itemPrice;
     char addcartchoice;
     fstream menuFile;
-    
-    while (true) {
-    system("cls");
-    cout << "\n---------------------------------------------------------" << endl;
-    cout << "\tWelcome to Restaurant Fusion Fare Delight!" << endl;
-    cout << "---------------------------------------------------------" << endl;
-    cout << "1. Menu" << endl;
-    cout << "2. My Cart" << endl;
-    cout << "3. Delete item from [My Cart]" << endl;
-    cout << "4. Logout" << endl;
-    cout << "5. EXIT" << endl;
-    cout << "\nEnter your choice :";
-    cin >> choice;
-    cin.ignore();
-    cout << endl;
 
-    Node *temp = nullptr;
-    int i = 1;
-
-    switch (choice)
+    while (true)
     {
-    case 1:
-    int displayChoice;
-    do {
         system("cls");
-        cout << "----------------------------------------" << endl;
-        cout << "              Menu Options         " << endl;
-        cout << "----------------------------------------" << endl;
-        cout << "0. View Unsorted Menu" << endl;
-        cout << "1. Sort by Price (Low to High)" << endl;
-        cout << "2. Sort by Price (High to Low)" << endl;
-        cout << "3. Sort Alphabetically (A-Z)" << endl;
-        cout << "4. Sort Alphabetically (Z-A)" << endl;
-        cout << "5. Search Menu Items" << endl;
-        cout << "6. Back to Main Menu" << endl;
-        cout << "\nEnter your choice : ";
-        cin >> displayChoice;
+        cout << "\n---------------------------------------------------------" << endl;
+        cout << "\tWelcome to Restaurant Fusion Fare Delight!" << endl;
+        cout << "---------------------------------------------------------" << endl;
+        cout << "1. Menu" << endl;
+        cout << "2. My Cart" << endl;
+        cout << "3. Delete item from [My Cart]" << endl;
+        cout << "4. Logout" << endl;
+        cout << "5. EXIT" << endl;
+        cout << "\nEnter your choice :";
+        cin >> choice;
+        cin.ignore();
+        cout << endl;
 
-        if (displayChoice >= 0 && displayChoice <= 4) {
-            R.readFile(displayChoice);
-            cout << endl;
-            cout << "Press Enter to continue...";
+        Node *temp = nullptr;
+        int i = 1;
+
+        switch (choice)
+        {
+        case 1:
+            int displayChoice;
+            do
+            {
+                system("cls");
+                cout << "----------------------------------------" << endl;
+                cout << "              Menu Options         " << endl;
+                cout << "----------------------------------------" << endl;
+                cout << "0. View Unsorted Menu" << endl;
+                cout << "1. Sort by Price (Low to High)" << endl;
+                cout << "2. Sort by Price (High to Low)" << endl;
+                cout << "3. Sort Alphabetically (A-Z)" << endl;
+                cout << "4. Sort Alphabetically (Z-A)" << endl;
+                cout << "5. Search Menu Items" << endl;
+                cout << "6. Back to Main Menu" << endl;
+                cout << "\nEnter your choice : ";
+                cin >> displayChoice;
+
+                if (displayChoice >= 0 && displayChoice <= 4)
+                {
+                    R.readFile(displayChoice);
+                    cout << endl;
+                    cout << "Press Enter to continue...";
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cin.get();
+                }
+                else if (displayChoice == 5)
+                {
+                    int searchChoice;
+                    cout << "----------------------------------------" << endl;
+                    cout << "              Search Options            " << endl;
+                    cout << "----------------------------------------" << endl;
+                    cout << "1. Search by Name" << endl;
+                    cout << "2. Search by Price Range" << endl;
+                    cout << "\nEnter your choice : ";
+                    cin >> searchChoice;
+
+                    if (searchChoice == 1)
+                    {
+                        string itemName;
+                        cout << "Enter the name of the item to search: ";
+                        cin.ignore();
+                        getline(cin, itemName);
+                        searchResults(head, itemName, 1); // Assuming 1 is for Ternary Search
+                    }
+                    else if (searchChoice == 2)
+                    {
+                        float minPrice, maxPrice;
+                        cout << "Enter the minimum price: RM ";
+                        cin >> minPrice;
+                        cout << "Enter the maximum price: RM ";
+                        cin >> maxPrice;
+                        searchResults(head, minPrice, maxPrice);
+                    }
+                    else
+                    {
+                        cout << "Invalid search option." << endl;
+                    }
+                    cout << "\nPress Enter to continue...";
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cin.get();
+                }
+                else if (displayChoice == 6)
+                {
+                    break;
+                }
+                else
+                {
+                    cout << endl
+                         << "Invalid choice. Please press enter to select again.";
+                    // Pause for a moment to let the user read the message
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cin.get();
+                }
+            } while (displayChoice != 6);
+            break;
+
+        case 2: // My Cart
+            cart.displayCart();
+            cout << "\nPress Enter to continue...";
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cin.get();
-        } else if (displayChoice == 5) {
-        int searchChoice;
-        cout << "----------------------------------------" << endl;
-        cout << "              Search Options            " << endl;
-        cout << "----------------------------------------" << endl;
-        cout << "1. Search by Name" << endl;
-        cout << "2. Search by Price Range" << endl;
-        cout << "\nEnter your choice : ";
-        cin >> searchChoice;
+            break;
 
-        if (searchChoice == 1) {
-            string itemName;
-            cout << "Enter the name of the item to search: ";
-            cin.ignore();
-            getline(cin, itemName);
-            searchResults(head, itemName, 1); // Assuming 1 is for Ternary Search
-        } else if (searchChoice == 2) {
-            float minPrice, maxPrice;
-            cout << "Enter the minimum price: RM ";
-            cin >> minPrice;
-            cout << "Enter the maximum price: RM ";
-            cin >> maxPrice;
-            searchResults(head, minPrice, maxPrice);
-        } else {
-            cout << "Invalid search option." << endl;
-        }
-        cout << "\nPress Enter to continue...";
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cin.get();
-    } else if (displayChoice == 6) {
-        break;
-    } else {
-        cout << endl << "Invalid choice. Please press enter to select again.";
-        // Pause for a moment to let the user read the message
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cin.get();
-    }
-} while (displayChoice != 6);
-break;
+        case 3:
+            cart.removeFromCart();
+            cout << "\nPress Enter to continue...";
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cin.get();
+            break;
 
-case 2: // My Cart
-    cart.displayCart();
-    cout << "\nPress Enter to continue...";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    cin.get();
-    break;
+        case 4:
+            cout << "Thank you for visiting Restaurant Fusion Fare Delights." << endl;
+            exit(0);
+            break;
 
-    case 3:
-        cart.removeFromCart();
-        cout << "\nPress Enter to continue...";
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cin.get();
-        break;   
-    
-
-    case 4:
-        cout << "Thank you for visiting Restaurant Fusion Fare Delights." << endl;
-        exit(0);
-        break;
-
-    default:
-        system("cls");
-        cout << "Invalid choice. Please select again." << endl;
-        showMenuOptions(head,cart,R);
-        break;
-    	} // end of switch
+        default:
+            system("cls");
+            cout << "Invalid choice. Please select again." << endl;
+            showMenuOptions(head, cart, R);
+            break;
+        } // end of switch
     } // end of while loop
-     goBackToMenu(head, cart, R); // Pass the cart instance to goBackToMenu
+    goBackToMenu(head, cart, R); // Pass the cart instance to goBackToMenu
 } // end function
 
-void goBackToMenu(Node *&head, Cart& cart, Restaurant &R) {
-     // Create a static Cart object
-    //static Cart cart;
+void goBackToMenu(Node *&head, Cart &cart, Restaurant &R)
+{
+    // Create a static Cart object
+    // static Cart cart;
     cout << "\nEnter 1 to go back to the homepage, 2 to Sorting Menu or 3 to Search Menu: ";
     int backChoice;
     cin >> backChoice;
@@ -1832,7 +2013,7 @@ void goBackToMenu(Node *&head, Cart& cart, Restaurant &R) {
     else
     {
         cout << "Invalid choice. Please select again." << endl;
-        goBackToMenu(head, cart,R); // Recursive call with correct parameters
+        goBackToMenu(head, cart, R); // Recursive call with correct parameters
     }
 }
 
@@ -1882,7 +2063,7 @@ public:
                 getline(cin, inputPass);
 
             } while (inputId != adminId || inputPass != adminPass); // end of do-while loop
-        }                                                           // end of if else
+        } // end of if else
 
     } // end of void adminlogin
 };
@@ -1894,7 +2075,7 @@ class Adminpage : public Admin
 private:
     int choice;
     int back;
-    Node* head; // Head of the linked list
+    Node *head; // Head of the linked list
 
 protected:
 public:
@@ -1903,10 +2084,10 @@ public:
     // Destructor to free linked list memory
     ~Adminpage()
     {
-        Node* current = head;
+        Node *current = head;
         while (current != nullptr)
         {
-            Node* next = current->next;
+            Node *next = current->next;
             delete current;
             current = next;
         }
@@ -1943,7 +2124,7 @@ public:
             break;
         case 3:
             system("cls");
-            //C.displaySalesReport();
+            // C.displaySalesReport();
             returntopage();
             break;
         case 4:
@@ -1986,7 +2167,7 @@ public:
             cin.ignore();
             getline(cin, itemName);
             deleteMenuItem(head, itemName); // Call the friend function
-            displayUpdatedMenu(); // Display the updated menu
+            displayUpdatedMenu();           // Display the updated menu
         }
         else if (pick == 3)
         {
@@ -2010,7 +2191,7 @@ public:
 
     void displayUpdatedMenu()
     {
-        Node* temp = head;
+        Node *temp = head;
         int itemNumber = 0;
 
         cout << "Updated Menu" << endl;
@@ -2023,46 +2204,47 @@ public:
 
     void manageUser()
     {
-        string userName;
-        cout << "Enter the username of the user to remove: ";
-        cin.ignore(); // Clear the newline character from the buffer
-        getline(cin, userName);
 
-        ifstream inFile("user records.txt");
-        ofstream outFile("temp_users.txt");
+        string username, position;
+        system("cls"); // Clear the screen
+        cin.ignore();  // Clear the newline character from the buffer
 
-        string line;
-        bool found = false;
+        cout << "Enter the username of the new staff: ";
+        getline(cin, username);
+        cout << "Enter the position of the new staff: ";
+        getline(cin, position);
 
-        while (getline(inFile, line))
+        ofstream outFile("admin.txt", ios::app);
+        if (outFile.is_open())
         {
-            stringstream ss(line);
-            string existingUsername;
-            ss >> existingUsername;
+            outFile << username << " " << position << endl;
+            outFile.close();
 
-            if (existingUsername == userName)
+            // Add staff to the linked list
+            Staff newStaff(username, position);
+            StaffNode *newNode = new StaffNode(newStaff);
+
+            StaffNode *staffHead = nullptr; // Declare and initialize staffHead variable
+
+            if (!staffHead)
             {
-                // Skip the line to delete the user
-                found = true;
-                continue;
+                staffHead = newNode;
             }
-            outFile << line << endl;
-        }
+            else
+            {
+                StaffNode *temp = staffHead;
+                while (temp->next)
+                {
+                    temp = temp->next;
+                }
+                temp->next = newNode;
+            }
 
-        // closes files
-        inFile.close();
-        outFile.close();
-
-        if (found)
-        {
-            remove("user records.txt");
-            rename("temp_users.txt", "user records.txt");
-            cout << "User removed successfully.\n";
+            cout << "Staff added successfully.\n";
         }
         else
         {
-            cout << "User not found.\n";
-            remove("temp_users.txt");
+            cout << "Error opening admin.txt for writing.\n";
         }
 
         returntopage();
@@ -2078,7 +2260,7 @@ public:
 
     bool searchItem(const string &itemName)
     {
-        Node* temp = head;
+        Node *temp = head;
         string itemNameLower = toLowercase(itemName);
         bool found = false;
 
@@ -2124,7 +2306,7 @@ public:
 
 }; // end of class Adminpage
 
-void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart, Admin &admin, Adminpage &ap)
+void welcomePage(User &user, Restaurant &R, Node *&head, Cart &cart, Admin &admin, Adminpage &ap)
 {
     int choice;
     do
@@ -2150,8 +2332,8 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart, Admin &admi
                 if (user.isLoggedIn())
                 {
                     // Read menu data from file and populate linked list
-				    //R.readFile(head, 0); // Pass 0 as displayChoice to skip sorting
-				    showMenuOptions(head,cart, R);
+                    // R.readFile(head, 0); // Pass 0 as displayChoice to skip sorting
+                    showMenuOptions(head, cart, R);
                 }
                 break;
             case 2:
@@ -2161,8 +2343,8 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart, Admin &admi
                 user.forgetPassword();
                 break;
             case 4:
-               admin.adminlogin();
-               ap.displayAdmin();
+                admin.adminlogin();
+                ap.displayAdmin();
                 break;
             case 5:
                 cout << "Thank you for visiting Restaurant Fusion Fare Delights." << endl;
@@ -2172,10 +2354,10 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart, Admin &admi
                 cout << "\nPlease select a valid option\n"
                      << endl;
             } // end of switch
-        }     // end of if
-        //else
+        } // end of if
+        // else
         //{
-            //showMenuOptions(user, admin, ap, R, C);
+        // showMenuOptions(user, admin, ap, R, C);
         //} // end of else
 
     } while (choice != 5); // end of do
@@ -2185,14 +2367,13 @@ int main()
 {
     Node *head = nullptr;
     User user;
-    Cart cart(user);  
-    Restaurant R(cart); 
+    Cart cart(user);
+    Restaurant R(cart);
     Admin admin;
-    Adminpage ap; 
+    Adminpage ap;
     user.initializeUserRecords();
     cart.initializeInventoryFile();
     welcomePage(user, R, head, cart, admin, ap);
-
 
     // Clean up dynamically allocated memory
     Node *temp = head;
