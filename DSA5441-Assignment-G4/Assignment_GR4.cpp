@@ -30,6 +30,20 @@ struct UserRecord {
         : username(username), email(email), address(address), contactNumber(contactNumber), password(password), next(nullptr) {}
 };
 
+struct Staff {
+    string username;
+    string position;
+
+    Staff(const string& user, const string& pos) : username(user), position(pos) {}
+};
+
+struct StaffNode {
+    Staff data;
+    StaffNode* next;
+
+    StaffNode(const Staff& s) : data(s), next(nullptr) {}
+};
+
 class User
 {
 private:
@@ -1662,15 +1676,7 @@ public:
         }
         else if (pick == 2)
         {
-            cout << "Enter the name of the item to delete: ";
-            cin.ignore();
-            getline(cin, itemName);
-            deleteMenuItem(head, itemName); // Call the friend function
-            displayUpdatedMenu();           // Display the updated menu
-        }
-        else if (pick == 3)
-        {
-            do
+           do
             {
                 cout << "Enter the name of the item to search: ";
                 cin.ignore();
@@ -1679,7 +1685,7 @@ public:
                 cout << "Do you want to search again? [Y/N]: ";
                 cin >> searchAgain;
             } while (toupper(searchAgain) == 'Y'); // end of do while
-        }
+        }        
         else
         {
             cout << "Invalid choice. Please try again.\n";
@@ -1703,46 +1709,46 @@ public:
 
     void manageUser()
     {
-        string userName;
-        cout << "Enter the username of the user to remove: ";
-        cin.ignore(); // Clear the newline character from the buffer
-        getline(cin, userName);
+        string username, position;
+        system("cls"); // Clear the screen
+        cin.ignore();  // Clear the newline character from the buffer
 
-        ifstream inFile("user records.txt");
-        ofstream outFile("temp_users.txt");
+        cout << "Enter the username of the new staff: ";
+        getline(cin, username);
+        cout << "Enter the position of the new staff: ";
+        getline(cin, position);
 
-        string line;
-        bool found = false;
-
-        while (getline(inFile, line))
+        ofstream outFile("admin.txt", ios::app);
+        if (outFile.is_open())
         {
-            stringstream ss(line);
-            string existingUsername;
-            ss >> existingUsername;
+            outFile << username << " " << position << endl;
+            outFile.close();
 
-            if (existingUsername == userName)
+            // Add staff to the linked list
+            Staff newStaff(username, position);
+            StaffNode *newNode = new StaffNode(newStaff);
+
+            StaffNode *staffHead = nullptr; // Declare and initialize staffHead variable
+
+            if (!staffHead)
             {
-                // Skip the line to delete the user
-                found = true;
-                continue;
+                staffHead = newNode;
             }
-            outFile << line << endl;
-        }
+            else
+            {
+                StaffNode *temp = staffHead;
+                while (temp->next)
+                {
+                    temp = temp->next;
+                }
+                temp->next = newNode;
+            }
 
-        // closes files
-        inFile.close();
-        outFile.close();
-
-        if (found)
-        {
-            remove("user records.txt");
-            rename("temp_users.txt", "user records.txt");
-            cout << "User removed successfully.\n";
+            cout << "Staff added successfully.\n";
         }
         else
         {
-            cout << "User not found.\n";
-            remove("temp_users.txt");
+            cout << "Error opening admin.txt for writing.\n";
         }
 
         returntopage();
