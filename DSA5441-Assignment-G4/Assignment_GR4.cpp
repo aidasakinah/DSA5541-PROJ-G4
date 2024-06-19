@@ -247,21 +247,6 @@ void login() {
         cout << "\nRegistration Successful\n";
     }
 
-    void forgetPassword() {
-    string input;
-    cout << "Enter your username or email \t: ";
-    getline(cin, input);
-
-    UserRecord* userRecord = findUserRecord(trim(input));
-    if (userRecord != nullptr) {
-        cout << "Your password is \t\t: " << userRecord->password << endl;
-    } else {
-        cout << "User not found. Please check your username or email." << endl;
-    }
-
-    system("pause");
-    system("cls");
-}
 
     bool isLoggedIn() const
     {
@@ -426,81 +411,54 @@ void countSort(Node *&head, int pos){
 
     head = newHead;
 }
-
-// alphabetically ascending
-void radixSort(Node *&head)
-{
-    int maxLen = 0;
-    Node *temp = head;
-    while (temp)
-    {
-        maxLen = max(maxLen, static_cast<int>(temp->data.name.length()));
-        temp = temp->next;
-    }
-
-    for (int pos = maxLen - 1; pos >= 0; pos--)
-    {
-        countSort(head, pos);
+void selectionSort(Node** head, int n) {
+    Node* temp;
+    for (int i = 0; i < n - 1; i++) {
+        int min_idx = i;
+        for (int j = i + 1; j < n; j++) {
+            if (head[j]->data.name < head[min_idx]->data.name) {
+                min_idx = j;
+            }
+        }
+        temp = head[min_idx];
+        head[min_idx] = head[i];
+        head[i] = temp;
     }
 }
+void sortByName(Node* &head) {
+    if (head == nullptr || head->next == nullptr) {
+        return; // List is empty or has only one node, no need to sort
+    }
 
-
-void countSortDescending(Node *&head, int pos){
-    Node *temp = head;
-    Node *nodeList[MAX_ITEM];
+    // Create an array to store pointers to the nodes
+    Node* temp = head;
     int count = 0;
-
-    // Store all nodes in an array
-    while (temp) {
-        nodeList[count++] = temp;
+    while (temp != nullptr) {
+        count++;
         temp = temp->next;
     }
 
-    // Sort the array based on the character at the current position in descending order
-    sort(nodeList, nodeList + count, [pos](Node *a, Node *b) {
-        if (pos >= a->data.name.length() && pos >= b->data.name.length()) {
-            return false;
-        }
-        else if (pos >= a->data.name.length()) {
-            return true;
-        }
-        else if (pos >= b->data.name.length()) {
-            return false;
-        }
-        else {
-            return a->data.name[pos] > b->data.name[pos];
-        }
-    });
+    Node* arr[count];
+    int i = 0;
+    temp = head;
+    while (temp != nullptr) {
+        arr[i++] = temp;
+        temp = temp->next;
+    }
+
+    // Sort the array using Selection Sort
+    selectionSort(arr, count);
 
     // Rebuild the linked list from the sorted array
-    Node *newHead = nullptr;
-    Node *tail = nullptr;
-    for (int i = 0; i < count; i++) {
-        nodeList[i]->next = nullptr;
-        if (newHead == nullptr) {
-            newHead = nodeList[i];
-        }
-        else {
-            tail->next = nodeList[i];
-        }
-        tail = nodeList[i];
-    }
-
-    head = newHead;
-}
-
-void radixSortDescending(Node *&head) {
-    int maxLen = 0;
-    Node *temp = head;
-    while (temp) {
-        maxLen = max(maxLen, static_cast<int>(temp->data.name.length()));
+    head = arr[0];
+    temp = head;
+    for (i = 1; i < count; i++) {
+        temp->next = arr[i];
         temp = temp->next;
     }
-
-    for (int pos = maxLen - 1; pos >= 0; pos--) {
-        countSortDescending(head, pos);
-    }
+    temp->next = nullptr;
 }
+
 
 // Custom sorting algorithm: Find minimum and swap
 void customSort(Node *&head){
@@ -809,31 +767,6 @@ void searchResults(Node *head, float minPrice, float maxPrice) {
     }
 }
 
-// Overloaded function to search for items by category
-//void searchResults(Node* head, const string& category) {
-//    if (!head) {
-//        cout << "The menu is empty." << endl;
-//        return;
-//    }
-//
-//    cout << "----------------------------------------" << endl;
-//    cout << "     Search Results by Category        " << endl;
-//    cout << "----------------------------------------" << endl;
-//
-//    bool found = false;
-//    Node* temp = head;
-//    while (temp) {
-//        if (temp->data.category == category) {
-//            cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << endl;
-//            found = true;
-//        }
-//        temp = temp->next;
-//    }
-//
-//    if (!found) {
-//        cout << "No items found in the specified category." << endl;
-//    }
-//}
 
 void goBackToMenu(Node *&head, Cart &cart, Restaurant &R);
 void showMenuOptions(Node *&head, Cart &cart, Restaurant &R);
@@ -879,155 +812,6 @@ void addMenuItem(Node *&head, Cart &cart, Restaurant &R){
         cout << "Error opening Menu.txt for writing.\n";
     }
 }
-
-// menu sorting algorithm
-// finished
-void algorithmSortMenu(Node *&head, Cart &cart, Restaurant &R){
-    int sortalgo, radixChoice, bucketChoice;
-    system("cls");
-    cout << "----------------------------------------" << endl;
-    cout << "            Sorting Algorithms          " << endl;
-    cout << "----------------------------------------" << endl;
-    cout << "1. Alphabetical Sort" << endl;
-    cout << "2. Price Sort" << endl;
-    cout << "3. Return to homepage" << endl;
-    cout << "\nEnter your choice: ";
-    cin >> sortalgo;
-
-    if (sortalgo == 1)
-    {
-        system("cls");
-        cout << "----------------------------------------" << endl;
-        cout << "               Radix Sort               " << endl;
-        cout << "----------------------------------------" << endl;
-        cout << "1. Alphabetically (A-Z)" << endl;
-        cout << "2. Alphabetically (Z-A)" << endl;
-        cout << "3. Return to previous page" << endl;
-        cout << "\nEnter your choice: ";
-        cin >> radixChoice;
-
-        if (radixChoice == 1)
-        {
-            system("cls");
-            radixSort(head);
-            printMenu(head);
-            goBackToMenu(head,cart,R);
-            algorithmSortMenu(head,cart,R);
-        }
-        else if (radixChoice == 2)
-        {
-            system("cls");
-            radixSortDescending(head);
-            printMenu(head);
-            goBackToMenu(head,cart,R);
-        }
-        else if (radixChoice == 3)
-        {
-            
-        }
-    }
-    else if (sortalgo == 2)
-    {
-        system("cls");
-        cout << "----------------------------------------" << endl;
-        cout << "               Bucket Sort              " << endl;
-        cout << "----------------------------------------" << endl;
-        cout << "1. Price Range (Lowest-Highest)" << endl;
-        cout << "2. Price Range (Highest to Lowest)" << endl;
-        cout << "3. Return to previous page" << endl;
-        cout << "\nEnter your choice: ";
-        cin >> bucketChoice;
-
-        if (bucketChoice == 1)
-        {
-            system("cls");
-            bucketSortAscending(head);
-            printMenu(head);
-            goBackToMenu(head,cart,R);
-        }
-        else if (bucketChoice == 2)
-        {
-            system("cls");
-            bucketSortDescending(head);
-            printMenu(head);
-            goBackToMenu(head,cart,R);
-        }
-        else if (bucketChoice == 3)
-        {
-            algorithmSortMenu(head,cart,R);
-        }
-    }
-    else if (sortalgo == 3)
-    {
-        system("cls");
-        printMenu(head);
-        goBackToMenu(head,cart,R);
-    }
-    else if (sortalgo == 4)
-    {
-        showMenuOptions(head, cart, R);
-    }
-    else
-    {
-        cout << "Invalid choice. Please select again." << endl;
-        algorithmSortMenu(head,cart,R);
-    }
-}
-
-//// menu search algorithm
-//void algorithmSearchMenu(Node *&head, Cart &cart, Restaurant &R){
-//    int searchType;
-//    system("cls");
-//    cout << "----------------------------------------" << endl;
-//    cout << "            Search Algorithms           " << endl;
-//    cout << "----------------------------------------" << endl;
-//    cout << "1. Ternary Search" << endl;
-//    cout << "2. Jump Search" << endl;
-//    cout << "3. Price Range Search" << endl;
-//    cout << "4. Return to homepage" << endl;
-//    cout << "\nEnter your choice: ";
-//    cin >> searchType;
-//
-//    if (searchType == 1)
-//    {
-//        system("cls");
-//        cout << "Enter the name of the item to search: ";
-//        string itemName;
-//        cin.ignore();
-//        getline(cin, itemName);
-//        searchResults(head, itemName, searchType);
-//        goBackToMenu(head,cart,R);
-//    }
-//    else if (searchType == 2)
-//    {
-//        system("cls");
-//        cout << "Enter the name of the item to search: ";
-//        string itemName;
-//        cin.ignore();
-//        getline(cin, itemName);
-//        searchResults(head, itemName, searchType);
-//        goBackToMenu(head,cart,R);
-//    }
-//    else if (searchType == 3) {
-//        system("cls");
-//        float minPrice, maxPrice;
-//        cout << "Enter the minimum price: RM ";
-//        cin >> minPrice;
-//        cout << "Enter the maximum price: RM ";
-//        cin >> maxPrice;
-//        searchResults(head, minPrice, maxPrice);
-//        goBackToMenu(head,cart,R);
-//    }
-//    else if (searchType == 4)
-//    {
-//        showMenuOptions(head,cart, R);
-//    }
-//    else
-//    {
-//        cout << "Invalid choice. Please select again." << endl;
-//        algorithmSearchMenu(head,cart,R);
-//    }
-//}
 
 void printSortedMenu(Node *head, int displayChoice) {
     if (head == nullptr) {
@@ -1575,10 +1359,12 @@ Restaurant(Cart& c) : cart(c), originalHead(nullptr), sortedHead(nullptr) {}
         } else if (displayChoice == 2) {
             bucketSortDescending(sortedHead);
         } else if (displayChoice == 3) {
-            radixSort(sortedHead);
-        } else if (displayChoice == 4) {
-            radixSortDescending(sortedHead);
-        }
+//            system("cls");
+	        sortByName(sortedHead); // Note: changed from head to sortedHead
+            printMenu(sortedHead);  // Note: changed from head to sortedHead
+	        
+    	}
+
     }
 };//end of class restaurant
 
@@ -1623,10 +1409,9 @@ void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
         cout << "0. View Unsorted Menu" << endl;
         cout << "1. Sort by Price (Low to High)" << endl;
         cout << "2. Sort by Price (High to Low)" << endl;
-        cout << "3. Sort Alphabetically (A-Z)" << endl;
-        cout << "4. Sort Alphabetically (Z-A)" << endl;
-        cout << "5. Search Menu Items" << endl;
-        cout << "6. Back to Main Menu" << endl;
+        cout << "3. Selection Sort by Name" << endl;
+        cout << "4. Search Menu Items" << endl;
+        cout << "5. Back to Main Menu" << endl;
         cout << "\nEnter your choice : ";
         cin >> displayChoice;
 
@@ -1636,7 +1421,7 @@ void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
             cout << "Press Enter to continue...";
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cin.get();
-        } else if (displayChoice == 5) {
+        } else if (displayChoice == 4) {
         int searchChoice;
         cout << "----------------------------------------" << endl;
         cout << "              Search Options            " << endl;
@@ -1665,7 +1450,7 @@ void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
         cout << "\nPress Enter to continue...";
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cin.get();
-    } else if (displayChoice == 6) {
+    }  else if (displayChoice == 5) {
         break;
     } else {
         cout << endl << "Invalid choice. Please press enter to select again.";
@@ -1718,7 +1503,7 @@ void goBackToMenu(Node *&head, Cart& cart, Restaurant &R) {
     }
     else if (backChoice == 2)
     {
-        algorithmSortMenu(head, cart, R);
+        //algorithmSortMenu(head, cart, R);
     }
     else if (backChoice == 3)
     {
@@ -2031,9 +1816,8 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart, Admin &admi
             cout << "---------------------------------------------------------" << endl;
             cout << "1. USER LOGIN" << endl;
             cout << "2. USER REGISTER" << endl;
-            cout << "3. FORGET PASSWORD" << endl;
-            cout << "4. ADMINISTRATOR LOGIN" << endl;
-            cout << "5. EXIT" << endl;
+            cout << "3. ADMINISTRATOR LOGIN" << endl;
+            cout << "4. EXIT" << endl;
             cout << "\nEnter your choice :";
             cin >> choice;
             cin.ignore(); // To consume the '\n' character after cin >>
@@ -2053,13 +1837,10 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart, Admin &admi
                 user.registration();
                 break;
             case 3:
-                user.forgetPassword();
-                break;
-            case 4:
                admin.adminlogin();
                ap.displayAdmin();
                 break;
-            case 5:
+            case 4:
                 cout << "Thank you for visiting Restaurant Fusion Fare Delights." << endl;
                 exit(0);
 
@@ -2115,5 +1896,4 @@ int main() {
 
     return 0;
 }
-
 
