@@ -1609,9 +1609,9 @@ public:
     // Friend function declarations
     friend void addMenuItem(Node *&head, Cart &cart, Restaurant &R);
     friend void deleteMenuItem(Node *&head, const string &name);
-    friend void binarySearch(Node* head, const string& key);
+    friend void searchResults(Node* head, const string& itemName);
 
-    void displayAdmin()
+    void displayAdmin(Node *&head)
     {
         User user;
         Admin admin;
@@ -1631,7 +1631,7 @@ public:
         switch (choice)
         {
         case 1:
-            manageMenu();
+            manageMenu(head);
             break;
         case 2:
             manageUser();
@@ -1653,7 +1653,7 @@ public:
         }
     }
 
-    void manageMenu()
+    void manageMenu(Node *&head)
     {
         int pick;
         User user;
@@ -1661,10 +1661,10 @@ public:
         Restaurant R(cart);
         cout << "Enter [1] to add item to menu OR [2] to search for item from menu : ";
         cin >> pick;
-        manageMenu(pick, cart, R); // Call the overloaded function
+        manageMenu(pick, cart, R, head); // Call the overloaded function
     }
 
-    void manageMenu(int pick, Cart &cart, Restaurant &R)
+    void manageMenu(int pick, Cart &cart, Restaurant &R, Node *&head)
     {
         string itemName;
         char searchAgain;
@@ -1682,7 +1682,7 @@ public:
                 cout << "Enter the name of the item to search: ";
                 cin.ignore();
                 getline(cin, itemName);
-                binarySearch(head, itemName); // Call the friend function
+                searchResults(head, itemName); // Call the friend function
                 cout << "Do you want to search again? [Y/N]: ";
                 cin >> searchAgain;
             } while (toupper(searchAgain) == 'Y'); // end of do while
@@ -1797,7 +1797,7 @@ public:
 
         if (back == 1)
         {
-            displayAdmin();
+            displayAdmin(head);
         }
         else if (back == 2)
         {
@@ -1845,7 +1845,7 @@ void welcomePage(User& user, Restaurant& R, Node*& head, Cart &cart, Admin &admi
                 break;
             case 3:
                admin.adminlogin();
-               ap.displayAdmin();
+               ap.displayAdmin(head);
                 break;
             case 4:
                 cout << "Thank you for visiting Restaurant Fusion Fare Delights." << endl;
