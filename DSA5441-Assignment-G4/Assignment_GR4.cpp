@@ -1609,6 +1609,7 @@ public:
     // Friend function declarations
     friend void addMenuItem(Node *&head, Cart &cart, Restaurant &R);
     friend void deleteMenuItem(Node *&head, const string &name);
+    friend void binarySearch(Node* head, const string& key);
 
     void displayAdmin()
     {
@@ -1658,7 +1659,7 @@ public:
         User user;
         Cart cart(user);
         Restaurant R(cart);
-        cout << "Enter [1] to add item to menu OR [2] to remove item from menu OR [3] to search for item from menu : ";
+        cout << "Enter [1] to add item to menu OR [2] to search for item from menu : ";
         cin >> pick;
         manageMenu(pick, cart, R); // Call the overloaded function
     }
@@ -1681,7 +1682,7 @@ public:
                 cout << "Enter the name of the item to search: ";
                 cin.ignore();
                 getline(cin, itemName);
-                searchItem(itemName);
+                binarySearch(head, itemName); // Call the friend function
                 cout << "Do you want to search again? [Y/N]: ";
                 cin >> searchAgain;
             } while (toupper(searchAgain) == 'Y'); // end of do while
