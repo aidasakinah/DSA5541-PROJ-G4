@@ -1622,7 +1622,7 @@ public:
         cout << "\t>>>>>>>>>> Admin Page <<<<<<<<<<" << endl;
         cout << "---------------------------------------------------------" << endl;
         cout << "1. Manage Menu" << endl;
-        cout << "2. Manage User" << endl;
+        cout << "2. Manage Staff" << endl;
         cout << "3. Exit" << endl;
         cout << "\nEnter your choice : ";
         cin >> choice;
