@@ -1373,6 +1373,7 @@ Restaurant(Cart& c) : cart(c), originalHead(nullptr), sortedHead(nullptr) {}
 void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
 	//Restaurant R;
 	//Cart cart;
+    User user;
     int choice;
     string itemName, line, itemCategory, itemToDelete;
     float itemPrice;
@@ -1477,6 +1478,7 @@ case 2: // My Cart
     
 
     case 4:
+    user.logout();
         cout << "Thank you for visiting Restaurant Fusion Fare Delights." << endl;
         exit(0);
         break;
