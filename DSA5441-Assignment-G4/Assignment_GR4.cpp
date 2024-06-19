@@ -356,125 +356,60 @@ void deleteMenuItem(Node *&head, const string &name)
     cout << "Item \"" << name << "\" deleted successfully." << endl;
 }
 
-void countSort(Node *&head, int pos){
-    Node *temp = head;
-    Node *nodeList[MAX_ITEM];
-    int count = 0;
+// Merge sort helper function to merge two sorted linked lists
+Node* merge(Node* a, Node* b) {
+    if (!a) return b;
+    if (!b) return a;
 
-    // Store all nodes in an array
-    while (temp)
-    {
-        nodeList[count++] = temp;
-        temp = temp->next;
-    }
-
-    // Sort the array based on the character at the current position
-    sort(nodeList, nodeList + count, [pos](Node *a, Node *b)
-         {
-        if (pos >= a->data.name.length() && pos >= b->data.name.length()) {
-            return false;
-        } else if (pos >= a->data.name.length()) {
-            return false;
-        } else if (pos >= b->data.name.length()) {
-            return true;
-        } else {
-            return a->data.name[pos] < b->data.name[pos];
-        } });
-
-    // Rebuild the linked list from the sorted array
-    Node *newHead = nullptr;
-    Node *tail = nullptr;
-    for (int i = 0; i < count; i++)
-    {
-        nodeList[i]->next = nullptr;
-        if (newHead == nullptr)
-        {
-            newHead = nodeList[i];
-        }
-        else
-        {
-            tail->next = nodeList[i];
-        }
-        tail = nodeList[i];
-    }
-
-    head = newHead;
-}
-
-// alphabetically ascending
-void radixSort(Node *&head)
-{
-    int maxLen = 0;
-    Node *temp = head;
-    while (temp)
-    {
-        maxLen = max(maxLen, static_cast<int>(temp->data.name.length()));
-        temp = temp->next;
-    }
-
-    for (int pos = maxLen - 1; pos >= 0; pos--)
-    {
-        countSort(head, pos);
+    if (a->data.name < b->data.name) {
+        a->next = merge(a->next, b);
+        return a;
+    } else {
+        b->next = merge(a, b->next);
+        return b;
     }
 }
 
+// Merge sort helper function to split a linked list into two halves
+Node* split(Node* head) {
+    if (!head || !head->next) return nullptr;
 
-void countSortDescending(Node *&head, int pos){
-    Node *temp = head;
-    Node *nodeList[MAX_ITEM];
-    int count = 0;
+    Node* slow = head;
+    Node* fast = head->next;
 
-    // Store all nodes in an array
-    while (temp) {
-        nodeList[count++] = temp;
-        temp = temp->next;
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
     }
 
-    // Sort the array based on the character at the current position in descending order
-    sort(nodeList, nodeList + count, [pos](Node *a, Node *b) {
-        if (pos >= a->data.name.length() && pos >= b->data.name.length()) {
-            return false;
-        }
-        else if (pos >= a->data.name.length()) {
-            return true;
-        }
-        else if (pos >= b->data.name.length()) {
-            return false;
-        }
-        else {
-            return a->data.name[pos] > b->data.name[pos];
-        }
-    });
-
-    // Rebuild the linked list from the sorted array
-    Node *newHead = nullptr;
-    Node *tail = nullptr;
-    for (int i = 0; i < count; i++) {
-        nodeList[i]->next = nullptr;
-        if (newHead == nullptr) {
-            newHead = nodeList[i];
-        }
-        else {
-            tail->next = nodeList[i];
-        }
-        tail = nodeList[i];
-    }
-
-    head = newHead;
+    Node* temp = slow->next;
+    slow->next = nullptr;
+    return temp;
 }
 
-void radixSortDescending(Node *&head) {
-    int maxLen = 0;
-    Node *temp = head;
-    while (temp) {
-        maxLen = max(maxLen, static_cast<int>(temp->data.name.length()));
-        temp = temp->next;
-    }
+// Merge sort function for ascending order
+void mergeSortAscending(Node*& head) {
+    if (!head || !head->next) return;
 
-    for (int pos = maxLen - 1; pos >= 0; pos--) {
-        countSortDescending(head, pos);
-    }
+    Node* second = split(head);
+    mergeSortAscending(head);
+    mergeSortAscending(second);
+    head = merge(head, second);
 }
+
+// Merge sort function for descending order
+void mergeSortDescending(Node*& head) {
+    if (!head || !head->next) return;
+
+    Node* second = split(head);
+    mergeSortDescending(head);
+    mergeSortDescending(second);
+
+    // Merge the sorted lists in descending order
+    Node* merged = merge(second, head);
+    head = merged;
+}
+
 
 // Custom sorting algorithm: Find minimum and swap
 void customSort(Node *&head){
@@ -809,8 +744,8 @@ void jumpSearch(Node *head, const string &key){
         return;
     }
 
-    // Sort the linked list using radix sort in ascending order
-    radixSort(head);
+    // Sort the linked list using merge sort in ascending order
+    mergeSortAscending(head);
 
     // Display sorted search results in ascending order
     cout << "\nSorted Search Results by Name (Ascending):" << endl;
@@ -832,8 +767,8 @@ void jumpSearch(Node *head, const string &key){
         cout << "Item not found in the menu." << endl;
     }
 
-    // Sort the linked list using radix sort in descending order
-    radixSortDescending(head);
+    // Sort the linked list using merge sort in descending order
+    mergeSortDescending(head);
 
     // Display sorted search results in descending order
     cout << "\nSorted Search Results by Name (Descending):" << endl;
@@ -968,15 +903,15 @@ void algorithmSortMenu(Node *&head, Cart &cart, Restaurant &R){
         if (radixChoice == 1)
         {
             system("cls");
-            radixSort(head);
+            mergeSortAscending(head);
             printMenu(head);
             goBackToMenu(head,cart,R);
-            algorithmSortMenu(head,cart,R);
+            // algorithmSortMenu(head,cart,R);
         }
         else if (radixChoice == 2)
         {
             system("cls");
-            radixSortDescending(head);
+            mergeSortDescending(head);
             printMenu(head);
             goBackToMenu(head,cart,R);
         }
@@ -1610,9 +1545,9 @@ Restaurant(Cart& c) : cart(c), originalHead(nullptr), sortedHead(nullptr) {}
         } else if (displayChoice == 2) {
             bucketSortDescending(sortedHead);
         } else if (displayChoice == 3) {
-            radixSort(sortedHead);
+             mergeSortAscending(sortedHead);
         } else if (displayChoice == 4) {
-            radixSortDescending(sortedHead);
+            mergeSortDescending(sortedHead);
         }
     }
 };//end of class restaurant
@@ -1659,19 +1594,19 @@ void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
         cout << "1. Sort by Price (Low to High)" << endl;
         cout << "2. Sort by Price (High to Low)" << endl;
         cout << "3. Sort Alphabetically (A-Z)" << endl;
-        cout << "4. Sort Alphabetically (Z-A)" << endl;
-        cout << "5. Search Menu Items" << endl;
-        cout << "6. Back to Main Menu" << endl;
+        // cout << "4. Sort Alphabetically (Z-A)" << endl;
+        cout << "4. Search Menu Items" << endl;
+        cout << "5. Back to Main Menu" << endl;
         cout << "\nEnter your choice : ";
         cin >> displayChoice;
 
-        if (displayChoice >= 0 && displayChoice <= 4) {
+        if (displayChoice >= 0 && displayChoice <= 3) {
             R.readFile(displayChoice);
             cout << endl;
             cout << "Press Enter to continue...";
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cin.get();
-        } else if (displayChoice == 5) {
+        } else if (displayChoice == 4) {
         int searchChoice;
         cout << "----------------------------------------" << endl;
         cout << "              Search Options            " << endl;
@@ -1708,7 +1643,7 @@ void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cin.get();
     }
-} while (displayChoice != 6);
+} while (displayChoice != 5);
 break;
 
 case 2: // My Cart

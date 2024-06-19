@@ -1,4 +1,4 @@
-Nasi_Lemak_with_Fried_Chicken 0
+Nasi_Lemak_with_Fried_Chicken 10
 Curry_Mee 0
 Fried_Rice 0
 Mee_Soup 4
@@ -22,7 +22,7 @@ Limau_kasturi 0
 Buttermilk_chicken 0
 Teh_ais 10
 Fish&Chip 0
-yuhan 5
+yuhan 10
 Teh_O_Ping 0
 Milo_ping 0
 Teh_O_limau 0

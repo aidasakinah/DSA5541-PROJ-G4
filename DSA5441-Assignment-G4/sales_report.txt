@@ -130,3 +130,11 @@ Order Details:
 - Mee_Soup (Quantity: 4, Price per unit: RM6.00)
 Total Cost: RM24.00
 =============================================
+================ Sales Report ================
+User: juju
+Address: jalan juju
+Order Details:
+- Nasi_Lemak_with_Fried_Chicken (Quantity: 10, Price per unit: RM8.50)
+- yuhan (Quantity: 5, Price per unit: RM88.00)
+Total Cost: RM525.00
+=============================================
