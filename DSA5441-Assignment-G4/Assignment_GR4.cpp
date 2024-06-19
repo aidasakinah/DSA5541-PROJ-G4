@@ -720,184 +720,73 @@ string toLowerCase(const string &str){
     return lowerStr;
 }
 
-// Ternary Search
-void ternarySearch(Node *head, const string &key){
-    if (!head)
-        return;
-
-    // Convert key to lowercase
-    string lowerKey = toLowerCase(key);
-
-    // Display unsorted search results
-    cout << "Unsorted Search Results:" << endl;
-    bool foundUnsorted = false;
-    Node *temp = head;
-    while (temp)
-    {
-        string itemName = toLowerCase(temp->data.name);
-        if (itemName.find(lowerKey) != string::npos)
-        {
-            cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << " (" << temp->data.category << ")" << endl;
-            foundUnsorted = true;
-        }
-        temp = temp->next;
-    }
-
-    if (!foundUnsorted)
-    {
-        cout << "Item not found in the menu." << endl;
+// Binary search function with partial string search
+void binarySearch(Node* head, const string& key) {
+    if (!head) {
+        cout << "Menu is empty." << endl;
         return;
     }
-
-    // Sort the linked list in ascending order using bucket sort
-    bucketSortAscending(head);
-
-    // Display sorted search results in ascending order
-    cout << "\nSorted Search Results by Price (Ascending):" << endl;
-    bool foundSortedAscending = false;
-    temp = head;
-    while (temp)
-    {
-        string itemName = toLowerCase(temp->data.name);
-        if (itemName.find(lowerKey) != string::npos)
-        {
-            cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << " (" << temp->data.category << ")" << endl;
-            foundSortedAscending = true;
-        }
-        temp = temp->next;
-    }
-
-    if (!foundSortedAscending)
-    {
-        cout << "Item not found in the menu." << endl;
-        return;
-    }
-
-    // Sort the linked list in descending order using bucket sort
-    bucketSortDescending(head);
-
-    // Display sorted search results in descending order
-    cout << "\nSorted Search Results by Price (Descending):" << endl;
-    bool foundSortedDescending = false;
-    temp = head;
-    while (temp)
-    {
-        string itemName = toLowerCase(temp->data.name);
-        if (itemName.find(lowerKey) != string::npos)
-        {
-            cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << " (" << temp->data.category << ")" << endl;
-            foundSortedDescending = true;
-        }
-        temp = temp->next;
-    }
-
-    if (!foundSortedDescending)
-    {
-        cout << "Item not found in the menu." << endl;
-    }
-}
-
-// Jump Search
-void jumpSearch(Node *head, const string &key){
-    if (!head)
-        return;
 
     // Convert key to lowercase
     string lowerKey = toLowerCase(key);
 
     // Create a dummy array to hold the nodes
-    Node *dummy[MAX_ITEM];
+    Node* dummy[MAX_ITEM];
     int count = 0;
 
-    Node *temp = head;
-    while (temp)
-    {
+    Node* temp = head;
+    while (temp) {
         dummy[count++] = temp;
         temp = temp->next;
     }
 
-    // Display unsorted search results
-    cout << "Unsorted Search Results:" << endl;
+    // Sort the dummy array alphabetically
+    sort(dummy, dummy + count, [](Node* a, Node* b) {
+        return a->data.name < b->data.name;
+    });
+
+    // Perform binary search with partial string matching
+    int left = 0, right = count - 1;
     bool found = false;
-    for (int i = 0; i < count; ++i)
-    {
-        string itemName = toLowerCase(dummy[i]->data.name);
-        if (itemName.find(lowerKey) != string::npos)
-        {
-            cout << dummy[i]->data.name << " - RM" << fixed << setprecision(2) << dummy[i]->data.price << " (" << dummy[i]->data.category << ")" << endl;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        string itemName = toLowerCase(dummy[mid]->data.name);
+        if (itemName.find(lowerKey) == 0) { // Check if the item name starts with the search key
             found = true;
+            cout << "Item found in the menu: " << dummy[mid]->data.name << " - RM" << fixed << setprecision(2) << dummy[mid]->data.price << " (" << dummy[mid]->data.category << ")" << endl;
+
+            // Print all items that start with the search key
+            int i = mid - 1;
+            while (i >= 0 && toLowerCase(dummy[i]->data.name).find(lowerKey) == 0) {
+                cout << "Item found in the menu: " << dummy[i]->data.name << " - RM" << fixed << setprecision(2) << dummy[i]->data.price << " (" << dummy[i]->data.category << ")" << endl;
+                i--;
+            }
+
+            i = mid + 1;
+            while (i < count && toLowerCase(dummy[i]->data.name).find(lowerKey) == 0) {
+                cout << "Item found in the menu: " << dummy[i]->data.name << " - RM" << fixed << setprecision(2) << dummy[i]->data.price << " (" << dummy[i]->data.category << ")" << endl;
+                i++;
+            }
+            break;
+        } else if (itemName < lowerKey) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
         }
     }
 
-    if (!found)
-    {
-        cout << "Item not found in the menu." << endl;
-        return;
-    }
-
-    // Sort the linked list using radix sort in ascending order
-    radixSort(head);
-
-    // Display sorted search results in ascending order
-    cout << "\nSorted Search Results by Name (Ascending):" << endl;
-    temp = head;
-    found = false;
-    while (temp)
-    {
-        string itemName = toLowerCase(temp->data.name);
-        if (itemName.find(lowerKey) != string::npos)
-        {
-            cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << " (" << temp->data.category << ")" << endl;
-            found = true;
-        }
-        temp = temp->next;
-    }
-
-    if (!found)
-    {
-        cout << "Item not found in the menu." << endl;
-    }
-
-    // Sort the linked list using radix sort in descending order
-    radixSortDescending(head);
-
-    // Display sorted search results in descending order
-    cout << "\nSorted Search Results by Name (Descending):" << endl;
-    temp = head;
-    found = false;
-    while (temp)
-    {
-        string itemName = toLowerCase(temp->data.name);
-        if (itemName.find(lowerKey) != string::npos)
-        {
-            cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << " (" << temp->data.category << ")" << endl;
-            found = true;
-        }
-        temp = temp->next;
-    }
-
-    if (!found)
-    {
+    if (!found) {
         cout << "Item not found in the menu." << endl;
     }
 }
 
-void searchResults(Node *head, const string &itemName, int searchType){
-    if (searchType == 1)
-    {
-        cout << "----------------------------------------" << endl;
-        cout << "         Ternary Search Results         " << endl;
-        cout << "----------------------------------------" << endl;
-        ternarySearch(head, itemName);
-    }
-    else if (searchType == 2)
-    {
-        cout << "----------------------------------------" << endl;
-        cout << "           Jump Search Results          " << endl;
-        cout << "----------------------------------------" << endl;
-        jumpSearch(head, itemName);
-    }
+void searchResults(Node* head, const string& itemName) {
+    cout << "----------------------------------------" << endl;
+    cout << "          Binary Search Results         " << endl;
+    cout << "----------------------------------------" << endl;
+    binarySearch(head, itemName);
 }
+
 
 // Overloaded function to search by price range
 void searchResults(Node *head, float minPrice, float maxPrice) {
@@ -921,30 +810,30 @@ void searchResults(Node *head, float minPrice, float maxPrice) {
 }
 
 // Overloaded function to search for items by category
-void searchResults(Node* head, const string& category) {
-    if (!head) {
-        cout << "The menu is empty." << endl;
-        return;
-    }
-
-    cout << "----------------------------------------" << endl;
-    cout << "     Search Results by Category        " << endl;
-    cout << "----------------------------------------" << endl;
-
-    bool found = false;
-    Node* temp = head;
-    while (temp) {
-        if (temp->data.category == category) {
-            cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << endl;
-            found = true;
-        }
-        temp = temp->next;
-    }
-
-    if (!found) {
-        cout << "No items found in the specified category." << endl;
-    }
-}
+//void searchResults(Node* head, const string& category) {
+//    if (!head) {
+//        cout << "The menu is empty." << endl;
+//        return;
+//    }
+//
+//    cout << "----------------------------------------" << endl;
+//    cout << "     Search Results by Category        " << endl;
+//    cout << "----------------------------------------" << endl;
+//
+//    bool found = false;
+//    Node* temp = head;
+//    while (temp) {
+//        if (temp->data.category == category) {
+//            cout << temp->data.name << " - RM" << fixed << setprecision(2) << temp->data.price << endl;
+//            found = true;
+//        }
+//        temp = temp->next;
+//    }
+//
+//    if (!found) {
+//        cout << "No items found in the specified category." << endl;
+//    }
+//}
 
 void goBackToMenu(Node *&head, Cart &cart, Restaurant &R);
 void showMenuOptions(Node *&head, Cart &cart, Restaurant &R);
@@ -1085,60 +974,60 @@ void algorithmSortMenu(Node *&head, Cart &cart, Restaurant &R){
     }
 }
 
-// menu search algorithm
-void algorithmSearchMenu(Node *&head, Cart &cart, Restaurant &R){
-    int searchType;
-    system("cls");
-    cout << "----------------------------------------" << endl;
-    cout << "            Search Algorithms           " << endl;
-    cout << "----------------------------------------" << endl;
-    cout << "1. Ternary Search" << endl;
-    cout << "2. Jump Search" << endl;
-    cout << "3. Price Range Search" << endl;
-    cout << "4. Return to homepage" << endl;
-    cout << "\nEnter your choice: ";
-    cin >> searchType;
-
-    if (searchType == 1)
-    {
-        system("cls");
-        cout << "Enter the name of the item to search: ";
-        string itemName;
-        cin.ignore();
-        getline(cin, itemName);
-        searchResults(head, itemName, searchType);
-        goBackToMenu(head,cart,R);
-    }
-    else if (searchType == 2)
-    {
-        system("cls");
-        cout << "Enter the name of the item to search: ";
-        string itemName;
-        cin.ignore();
-        getline(cin, itemName);
-        searchResults(head, itemName, searchType);
-        goBackToMenu(head,cart,R);
-    }
-    else if (searchType == 3) {
-        system("cls");
-        float minPrice, maxPrice;
-        cout << "Enter the minimum price: RM ";
-        cin >> minPrice;
-        cout << "Enter the maximum price: RM ";
-        cin >> maxPrice;
-        searchResults(head, minPrice, maxPrice);
-        goBackToMenu(head,cart,R);
-    }
-    else if (searchType == 4)
-    {
-        showMenuOptions(head,cart, R);
-    }
-    else
-    {
-        cout << "Invalid choice. Please select again." << endl;
-        algorithmSearchMenu(head,cart,R);
-    }
-}
+//// menu search algorithm
+//void algorithmSearchMenu(Node *&head, Cart &cart, Restaurant &R){
+//    int searchType;
+//    system("cls");
+//    cout << "----------------------------------------" << endl;
+//    cout << "            Search Algorithms           " << endl;
+//    cout << "----------------------------------------" << endl;
+//    cout << "1. Ternary Search" << endl;
+//    cout << "2. Jump Search" << endl;
+//    cout << "3. Price Range Search" << endl;
+//    cout << "4. Return to homepage" << endl;
+//    cout << "\nEnter your choice: ";
+//    cin >> searchType;
+//
+//    if (searchType == 1)
+//    {
+//        system("cls");
+//        cout << "Enter the name of the item to search: ";
+//        string itemName;
+//        cin.ignore();
+//        getline(cin, itemName);
+//        searchResults(head, itemName, searchType);
+//        goBackToMenu(head,cart,R);
+//    }
+//    else if (searchType == 2)
+//    {
+//        system("cls");
+//        cout << "Enter the name of the item to search: ";
+//        string itemName;
+//        cin.ignore();
+//        getline(cin, itemName);
+//        searchResults(head, itemName, searchType);
+//        goBackToMenu(head,cart,R);
+//    }
+//    else if (searchType == 3) {
+//        system("cls");
+//        float minPrice, maxPrice;
+//        cout << "Enter the minimum price: RM ";
+//        cin >> minPrice;
+//        cout << "Enter the maximum price: RM ";
+//        cin >> maxPrice;
+//        searchResults(head, minPrice, maxPrice);
+//        goBackToMenu(head,cart,R);
+//    }
+//    else if (searchType == 4)
+//    {
+//        showMenuOptions(head,cart, R);
+//    }
+//    else
+//    {
+//        cout << "Invalid choice. Please select again." << endl;
+//        algorithmSearchMenu(head,cart,R);
+//    }
+//}
 
 void printSortedMenu(Node *head, int displayChoice) {
     if (head == nullptr) {
@@ -1762,7 +1651,7 @@ void showMenuOptions(Node *&head, Cart &cart, Restaurant &R){
             cout << "Enter the name of the item to search: ";
             cin.ignore();
             getline(cin, itemName);
-            searchResults(head, itemName, 1); // Assuming 1 is for Ternary Search
+            searchResults(head, itemName); // Use binary search
         } else if (searchChoice == 2) {
             float minPrice, maxPrice;
             cout << "Enter the minimum price: RM ";
@@ -1833,7 +1722,7 @@ void goBackToMenu(Node *&head, Cart& cart, Restaurant &R) {
     }
     else if (backChoice == 3)
     {
-        algorithmSearchMenu(head, cart, R);
+        //algorithmSearchMenu(head, cart, R);
     }
     else
     {
@@ -2196,6 +2085,24 @@ int main() {
     Adminpage ap; 
     user.initializeUserRecords();
     cart.initializeInventoryFile();
+
+    // Populate the linked list with menu items
+    string menuFileName = "Menu.txt";
+    ifstream menuFile(menuFileName.c_str(), ios::in);
+    if (!menuFile) {
+        cout << "File does not exist" << endl;
+        exit(1);
+    }
+
+    string name, category;
+    float price;
+
+    while (menuFile >> name >> price >> category) {
+        insertMenuItem(head, MenuItem(name, price, category));
+    }
+
+    menuFile.close();
+
     welcomePage(user, R, head, cart, admin, ap);
 
     // Clean up dynamically allocated memory
