@@ -34,3 +34,5 @@ Milo_cincau 1.50 BEVERAGE
 Sirap_cincau 2.60 BEVERAGE
 laici_kang 2.40 BEVERAGE
 Honey_Tea 2.00 BEVERAGE
+Honey_Lemon_Tea 2.00 BEVERAGE
+Honey_Lemon_Tea_ice 2.50 BEVERAGE

@@ -1845,14 +1845,6 @@ public:
         }
         else if (pick == 2)
         {
-            cout << "Enter the name of the item to delete: ";
-            cin.ignore();
-            getline(cin, itemName);
-            deleteMenuItem(head, itemName); // Call the friend function
-            displayUpdatedMenu();           // Display the updated menu
-        }
-        else if (pick == 3)
-        {
             do
             {
                 cout << "Enter the name of the item to search: ";
