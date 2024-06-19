@@ -1623,8 +1623,7 @@ public:
         cout << "---------------------------------------------------------" << endl;
         cout << "1. Manage Menu" << endl;
         cout << "2. Manage User" << endl;
-        cout << "3. Manage Order" << endl;
-        cout << "4. Exit" << endl;
+        cout << "3. Exit" << endl;
         cout << "\nEnter your choice : ";
         cin >> choice;
 
@@ -1637,11 +1636,6 @@ public:
             manageUser();
             break;
         case 3:
-            system("cls");
-            //C.displaySalesReport();
-            returntopage();
-            break;
-        case 4:
             cout << "Exiting, Returning to Main Menu" << endl;
             // welcomePage(user, admin, ap, R, C);
             // returntoWelcomePage();
