@@ -16,6 +16,8 @@ class Restaurant;  // Forward declaration
 class Cart;
 class User;
 class Receipt;
+
+
 struct UserRecord {
 	
     string username;
